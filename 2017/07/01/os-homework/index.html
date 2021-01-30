@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"john.js.org","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="记录操作系统课程的几个实验 实验一_进程的同步与互斥 通过学习和分析基础例子程序，使用windows进程和线程编程（也可以采用Java 或Unix&#x2F;Linux的POSIX线程编程）实现一个简单的生产者&#x2F;消费者问题的程序。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="操作系统实验">
+<meta property="og:url" content="https://john.js.org/2017/07/01/os-homework/index.html">
+<meta property="og:site_name" content="Dear John">
+<meta property="og:description" content="记录操作系统课程的几个实验 实验一_进程的同步与互斥 通过学习和分析基础例子程序，使用windows进程和线程编程（也可以采用Java 或Unix&#x2F;Linux的POSIX线程编程）实现一个简单的生产者&#x2F;消费者问题的程序。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2017-07-01T09:31:07.000Z">
+<meta property="article:modified_time" content="2021-01-30T07:46:00.144Z">
+<meta property="article:author" content="John">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://john.js.org/2017/07/01/os-homework/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>操作系统实验 | Dear John</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Dear John</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://john.js.org/2017/07/01/os-homework/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John">
+      <meta itemprop="description" content="notes of tech">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Dear John">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          操作系统实验
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-07-01 17:31:07" itemprop="dateCreated datePublished" datetime="2017-07-01T17:31:07+08:00">2017-07-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-30 15:46:00" itemprop="dateModified" datetime="2021-01-30T15:46:00+08:00">2021-01-30</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2017/07/01/os-homework/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2017/07/01/os-homework/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>记录操作系统课程的几个实验</p>
+<h4 id="实验一-进程的同步与互斥"><a href="#实验一-进程的同步与互斥" class="headerlink" title="实验一_进程的同步与互斥"></a>实验一_进程的同步与互斥</h4><blockquote>
+<p>通过学习和分析基础例子程序，使用windows进程和线程编程（也可以采用Java 或Unix/Linux的POSIX线程编程）实现一个简单的生产者/消费者问题的程序。</p>
+</blockquote>
+<a id="more"></a>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;thread&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;mutex&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;condition_variable&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="built_in">std</span>::mutex mtx;<span class="comment">//锁</span></span><br><span class="line"><span class="built_in">std</span>::condition_variable cv;<span class="comment">//条件变量</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> cargo = <span class="number">0</span>;<span class="comment">//货物数</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">shipment_available</span><span class="params">()</span><span class="comment">//是否有货</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> cargo != <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 消费者线程.</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">consumer</span><span class="params">(<span class="keyword">int</span> n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">        <span class="built_in">std</span>::unique_lock &lt;<span class="built_in">std</span>::mutex&gt; lk(mtx);</span><br><span class="line">        cv.wait(lk, shipment_available);<span class="comment">//若无货物被阻塞直到被唤醒</span></span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;消费了&quot;</span>&lt;&lt; cargo &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">        cargo = <span class="number">0</span>;</span><br><span class="line">        <span class="built_in">std</span>::this_thread::sleep_for(<span class="built_in">std</span>::chrono::milliseconds(<span class="number">250</span>));<span class="comment">//睡眠250毫秒</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function"><span class="built_in">std</span>::thread <span class="title">consumer_thread</span><span class="params">(consumer, <span class="number">10</span>)</span></span>; <span class="comment">// 建立消费者线程.</span></span><br><span class="line">    <span class="comment">// 主线程为生产者线程, 生产 10 个物品.</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; ++i) &#123;</span><br><span class="line">        <span class="keyword">while</span> (shipment_available())</span><br><span class="line">            <span class="built_in">std</span>::this_thread::yield();<span class="comment">//放弃本线程的CPU时间片，允许其他线程运行</span></span><br><span class="line">        <span class="built_in">std</span>::unique_lock &lt;<span class="built_in">std</span>::mutex&gt; lk(mtx);</span><br><span class="line">        cargo = i + <span class="number">1</span>;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;生产了&quot;</span>&lt;&lt; cargo &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">        cv.notify_one();<span class="comment">//唤醒等待线程</span></span><br><span class="line">        <span class="built_in">std</span>::this_thread::sleep_for(<span class="built_in">std</span>::chrono::milliseconds(<span class="number">100</span>));<span class="comment">//睡眠100毫秒</span></span><br><span class="line">    &#125;</span><br><span class="line">    consumer_thread.join();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="实验二-处理机调度"><a href="#实验二-处理机调度" class="headerlink" title="实验二_处理机调度"></a>实验二_处理机调度</h4><blockquote>
+<p>设计一个按优先权调度算法实现处理器调度的程序</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;queue&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PCB</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="keyword">char</span>	name[<span class="number">10</span>]; <span class="comment">/*进程名*/</span></span><br><span class="line">	<span class="keyword">int</span>	runtime; <span class="comment">/*运行时间*/</span></span><br><span class="line">	<span class="keyword">int</span>	priority; <span class="comment">/*优先级*/</span></span><br><span class="line">	<span class="keyword">char</span> state; <span class="comment">/*状态*/</span></span><br><span class="line">	PCB	* next; <span class="comment">/*指针*/</span></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">status</span><span class="params">()</span> <span class="keyword">const</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="built_in">cout</span>&lt;&lt;name&lt;&lt;<span class="string">&quot;\t&quot;</span>&lt;&lt;runtime&lt;&lt;<span class="string">&quot;\t\t&quot;</span>&lt;&lt;priority&lt;&lt;<span class="string">&quot;\t\t&quot;</span>&lt;&lt;state&lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PCBSortCriterion</span> &#123;</span> <span class="comment">/*优先准则*/</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="function"><span class="keyword">bool</span> <span class="title">operator</span><span class="params">()</span><span class="params">( <span class="keyword">const</span> PCB &amp; p1, <span class="keyword">const</span> PCB &amp; p2 )</span> <span class="keyword">const</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="keyword">return</span>(p1.priority &lt; p2.priority);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> number=<span class="number">5</span>;<span class="comment">/* 进程数 */</span></span><br><span class="line">	PCB	* pcb	= <span class="keyword">new</span> PCB[number];</span><br><span class="line">	PCB	* p1	= <span class="keyword">new</span> PCB[number];</span><br><span class="line">	PCB	p;</span><br><span class="line">	<span class="keyword">int</span>	i;</span><br><span class="line">	<span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;NAME,RUNTIME,PRIORITY&quot;</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">	<span class="keyword">for</span> ( i = <span class="number">0</span>; i &lt;= number - <span class="number">1</span>; i++ )</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">cin</span> &gt;&gt; pcb[i].name;</span><br><span class="line">		<span class="built_in">cin</span> &gt;&gt; pcb[i].runtime;</span><br><span class="line">		pcb[i].state=<span class="string">&#x27;R&#x27;</span>;</span><br><span class="line">		<span class="built_in">cin</span> &gt;&gt; pcb[i].priority;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">typedef</span> <span class="built_in">priority_queue</span>&lt;PCB, <span class="built_in">vector</span>&lt;PCB&gt;, PCBSortCriterion&gt; pQueue;</span><br><span class="line"></span><br><span class="line">	pQueue q,temp;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> ( <span class="keyword">int</span> j = <span class="number">0</span>; j &lt;= number - <span class="number">1</span>; j++ ) <span class="comment">/*建立优先队列 */</span></span><br><span class="line">	&#123;</span><br><span class="line">		q.push( pcb[j] );</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;初始状态:&quot;</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;NAME\t&quot;</span>&lt;&lt;<span class="string">&quot;NEEDTIME\t&quot;</span>&lt;&lt;<span class="string">&quot;PRIORITY\t&quot;</span> &lt;&lt;<span class="string">&quot;STATE\t&quot;</span>&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	temp = q;</span><br><span class="line">	<span class="keyword">while</span> ( !temp.empty() )</span><br><span class="line">	&#123;</span><br><span class="line">		p = temp.top();</span><br><span class="line">		p.status();</span><br><span class="line">		temp.pop();</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">int</span> n= <span class="number">0</span>,m= <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">while</span> ( !q.empty() )</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;CPUTIME:&quot;</span> &lt;&lt; ++n&lt;&lt;<span class="string">&quot;   &quot;</span>;</span><br><span class="line">		p = q.top();</span><br><span class="line">		<span class="built_in">cout</span> &lt;&lt; q.top().name &lt;&lt; <span class="string">&quot;!&quot;</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">		<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;NAME\t&quot;</span>&lt;&lt;<span class="string">&quot;NEEDTIME\t&quot;</span>&lt;&lt;<span class="string">&quot;PRIORITY\t&quot;</span> &lt;&lt;<span class="string">&quot;STATE\t&quot;</span>&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line"></span><br><span class="line">		p.runtime	-= <span class="number">1</span>;</span><br><span class="line">		p.priority	-= <span class="number">1</span>;</span><br><span class="line">		q.pop();</span><br><span class="line">		<span class="keyword">if</span> ( p.runtime != <span class="number">0</span> ) <span class="comment">/*继续入队*/</span></span><br><span class="line">		&#123;</span><br><span class="line">			q.push( p );</span><br><span class="line">		&#125;<span class="keyword">else</span>  &#123;</span><br><span class="line">			p.state = <span class="string">&#x27;Z&#x27;</span>;</span><br><span class="line">			p1[m++] = p;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		temp = q;</span><br><span class="line">		<span class="keyword">while</span> ( !temp.empty() )</span><br><span class="line">		&#123;</span><br><span class="line">			p = temp.top();</span><br><span class="line">			p.status();</span><br><span class="line">			temp.pop();</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> ( m &gt; <span class="number">0</span> )    <span class="comment">/* 输出完成信息 */</span></span><br><span class="line">			<span class="keyword">for</span> ( i = <span class="number">0</span>; i &lt;= m - <span class="number">1</span>; i++ )</span><br><span class="line">				p1[i].status();</span><br><span class="line">		<span class="built_in">cout</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">		<span class="built_in">cout</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;完成&quot;</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">	system( <span class="string">&quot;pause&quot;</span> );</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="实验三-存储管理"><a href="#实验三-存储管理" class="headerlink" title="实验三_存储管理"></a>实验三_存储管理</h4><blockquote>
+<p>1.模拟分页式存储管理中硬件的地址转换和产生缺页中断</p>
+</blockquote>
+<p><code>Page.java</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> ex3;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Page</span> </span>&#123;<span class="comment">//页表</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> pageId;<span class="comment">//页号</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> flag;<span class="comment">//标志，1则表示该页已经在主存</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> areaId;<span class="comment">//主存块号</span></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">Page</span><span class="params">(<span class="keyword">int</span> pageId, <span class="keyword">int</span> flag, <span class="keyword">int</span> areaId)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.pageId = pageId;</span><br><span class="line">		<span class="keyword">this</span>.flag = flag;</span><br><span class="line">		<span class="keyword">this</span>.areaId = areaId;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getPageId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> pageId;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPageId</span><span class="params">(<span class="keyword">int</span> pageId)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.pageId = pageId;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getFlag</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> flag;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setFlag</span><span class="params">(<span class="keyword">int</span> flag)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.flag = flag;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getAreaId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> areaId;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAreaId</span><span class="params">(<span class="keyword">int</span> areaId)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.areaId = areaId;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>Operation.java</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> ex3;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Operation</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> fifoindex=<span class="number">0</span>;<span class="comment">//操作</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> optinalIndex=<span class="number">0</span>;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> pageId;<span class="comment">//页号</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> pageAddress;<span class="comment">//业内地址</span></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">Operation</span><span class="params">()</span></span>&#123;</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">Operation</span><span class="params">(<span class="keyword">int</span> pageId,<span class="keyword">int</span> pageAddress)</span></span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.pageId=pageId;</span><br><span class="line">		<span class="keyword">this</span>.pageAddress=pageAddress;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getPageId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> pageId;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPageId</span><span class="params">(<span class="keyword">int</span> pageId)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.pageId = pageId;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getPageAddress</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> pageAddress;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPageAddress</span><span class="params">(<span class="keyword">int</span> pageAddress)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.pageAddress = pageAddress;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">boolean</span> <span class="title">flag</span><span class="params">(Page page[],Operation op)</span></span>&#123;</span><br><span class="line">		<span class="keyword">if</span>(page[op.getPageId()].getFlag()==<span class="number">1</span>)</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//输出页表</span></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">printPageTable</span><span class="params">(Page page[],Operation op,Operation op2,String oper)</span></span>&#123;</span><br><span class="line">		System.out.println(<span class="string">&quot;页号   &quot;</span>+<span class="string">&quot;标志   &quot;</span>+<span class="string">&quot;主存块号&quot;</span>);</span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">7</span>;i++)&#123;</span><br><span class="line">			System.out.print(page[i].getPageId()+page[i].getFlag()+page[i].getAreaId());</span><br><span class="line">		&#125;</span><br><span class="line">		System.out.println(<span class="string">&quot;&quot;</span>);</span><br><span class="line">		System.out.println(<span class="string">&quot;指令为&quot;</span>+oper+op.getPageId()+<span class="string">&quot; &quot;</span>+op.getPageAddress());</span><br><span class="line">		System.out.println(op2.getPageId()+<span class="string">&quot; &quot;</span>+op2.getPageAddress());</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//输出</span></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">(Page page[],Operation op,Operation op2,String oper)</span></span>&#123;</span><br><span class="line">		<span class="keyword">int</span> index1=<span class="number">0</span>,index2=<span class="number">0</span>;</span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">7</span>;i++)&#123;</span><br><span class="line">			<span class="keyword">if</span>(op.getPageId()==page[i].getPageId())</span><br><span class="line">				index1=i;</span><br><span class="line">			<span class="keyword">if</span>(op2.getPageId()==page[i].getPageId())</span><br><span class="line">				index2=i;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span>(oper.equals(<span class="string">&quot;读&quot;</span>))&#123;</span><br><span class="line">			System.out.println(<span class="string">&quot;(&quot;</span>+page[index1].getAreaId()+op.getPageId()+<span class="string">&quot;)&quot;</span>);</span><br><span class="line">			System.out.println(<span class="string">&quot;(&quot;</span>+page[index2].getAreaId()+op2.getPageId()+<span class="string">&quot;)&quot;</span>);</span><br><span class="line">		&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">			System.out.println(<span class="string">&quot;...&quot;</span>);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//调入主存</span></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">move</span><span class="params">(Page page[],Operation op)</span></span>&#123;</span><br><span class="line">		page[fifoindex].setFlag(<span class="number">0</span>);</span><br><span class="line">		page[fifoindex].setPageId(op.getPageId());</span><br><span class="line">		fifoindex++;</span><br><span class="line">		fifoindex=fifoindex%<span class="number">7</span>;</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">fifo</span><span class="params">(Page page[],Operation op,Operation op2,String oper)</span></span>&#123;</span><br><span class="line">		<span class="keyword">if</span>(!flag(page,op))&#123;</span><br><span class="line">			move(page,op);<span class="comment">//不在内存则调换</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span>(!flag(page,op2))&#123;</span><br><span class="line">			move(page,op2);</span><br><span class="line">		&#125;</span><br><span class="line">		printPageTable(page,op,op2,oper);</span><br><span class="line">		print(page,op,op2,oper);</span><br><span class="line">		System.out.println();</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>Main.java</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> ex3;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">		Page A=<span class="keyword">new</span> Page(<span class="number">0</span>,<span class="number">1</span>,<span class="number">5</span>);</span><br><span class="line">		Page B=<span class="keyword">new</span> Page(<span class="number">1</span>,<span class="number">1</span>,<span class="number">8</span>);</span><br><span class="line">		Page C=<span class="keyword">new</span> Page(<span class="number">2</span>,<span class="number">1</span>,<span class="number">9</span>);</span><br><span class="line">		Page D=<span class="keyword">new</span> Page(<span class="number">3</span>,<span class="number">1</span>,<span class="number">1</span>);</span><br><span class="line">		Page E=<span class="keyword">new</span> Page(<span class="number">4</span>,<span class="number">0</span>,<span class="number">0</span>);</span><br><span class="line">		Page F=<span class="keyword">new</span> Page(<span class="number">5</span>,<span class="number">0</span>,<span class="number">0</span>);</span><br><span class="line">		Page G=<span class="keyword">new</span> Page(<span class="number">6</span>,<span class="number">0</span>,<span class="number">0</span>);</span><br><span class="line">		Page page[]=&#123;A,B,C,D,E,F,G&#125;;</span><br><span class="line">		</span><br><span class="line">		Operation a=<span class="keyword">new</span> Operation(<span class="number">0</span>,<span class="number">070</span>);</span><br><span class="line">		Operation b=<span class="keyword">new</span> Operation(<span class="number">1</span>,<span class="number">050</span>);</span><br><span class="line">		Operation c=<span class="keyword">new</span> Operation(<span class="number">2</span>,<span class="number">015</span>);</span><br><span class="line">		Operation d=<span class="keyword">new</span> Operation(<span class="number">3</span>,<span class="number">021</span>);</span><br><span class="line">		Operation e=<span class="keyword">new</span> Operation(<span class="number">0</span>,<span class="number">056</span>);</span><br><span class="line">		Operation f=<span class="keyword">new</span> Operation(<span class="number">6</span>,<span class="number">040</span>);</span><br><span class="line">		Operation op[]=&#123;a,b,c,d,e,f&#125;;</span><br><span class="line">		</span><br><span class="line">		Operation o=<span class="keyword">new</span> Operation();</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>2.用先进先出（FIFO）页面调度算法处理缺页中断</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//没写</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="实验四-文件系统"><a href="#实验四-文件系统" class="headerlink" title="实验四_文件系统"></a>实验四_文件系统</h4><blockquote>
+<p>用高级语言编写和调试一个简单的文件系统，模拟文件管理的工作过程</p>
+</blockquote>
+<p><code>User.java</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> ex4;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> String name;</span><br><span class="line">	<span class="keyword">private</span> String password;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">User</span><span class="params">(String name, String password)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.name = name;</span><br><span class="line">		<span class="keyword">this</span>.password = password;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> name;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.name = name;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">getPassword</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> password;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPassword</span><span class="params">(String password)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.password = password;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p><code>FileOperation.java</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> ex4;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.BufferedReader;</span><br><span class="line"><span class="keyword">import</span> java.io.BufferedWriter;</span><br><span class="line"><span class="keyword">import</span> java.io.File;</span><br><span class="line"><span class="keyword">import</span> java.io.FileNotFoundException;</span><br><span class="line"><span class="keyword">import</span> java.io.FileReader;</span><br><span class="line"><span class="keyword">import</span> java.io.FileWriter;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.util.Scanner;</span><br><span class="line"></span><br><span class="line"><span class="comment">//文件操作类</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FileOperation</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">private</span> String address = <span class="string">&quot;D:\\server\\&quot;</span>;<span class="comment">//指定目录</span></span><br><span class="line">		<span class="keyword">private</span> File file;<span class="comment">//新建文件</span></span><br><span class="line">		<span class="keyword">private</span> <span class="keyword">int</span> num;<span class="comment">//操作选项</span></span><br><span class="line">		<span class="keyword">private</span> String fileName;<span class="comment">//新建文件名</span></span><br><span class="line">		<span class="keyword">private</span> String username;</span><br><span class="line">		</span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="title">FileOperation</span><span class="params">(String user)</span></span>&#123;</span><br><span class="line">			<span class="keyword">this</span>.address=<span class="keyword">this</span>.address+user+<span class="string">&quot;\\&quot;</span>;<span class="comment">//路径设置为用户目录</span></span><br><span class="line">			fileOperate();</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">fileOperate</span><span class="params">()</span> </span>&#123;</span><br><span class="line">			file = <span class="keyword">new</span> File(address);</span><br><span class="line">			file.mkdirs();</span><br><span class="line">			System.out.println(<span class="string">&quot;1:创建文件&quot;</span>);</span><br><span class="line">			System.out.println(<span class="string">&quot;2:读取文件&quot;</span>);</span><br><span class="line">			System.out.println(<span class="string">&quot;3:写入文件&quot;</span>);</span><br><span class="line">			System.out.println(<span class="string">&quot;4:删除文件&quot;</span>);</span><br><span class="line">			System.out.println(<span class="string">&quot;5:列文件目录 &quot;</span>);</span><br><span class="line">			System.out.println(<span class="string">&quot;6:退出 &quot;</span>);</span><br><span class="line">			</span><br><span class="line">			System.out.println(<span class="string">&quot;请输入：&quot;</span>);</span><br><span class="line">			<span class="comment">//操作文件的选项数字</span></span><br><span class="line">			Scanner input = <span class="keyword">new</span> Scanner(System.in);</span><br><span class="line">			<span class="keyword">try</span>&#123;</span><br><span class="line">				</span><br><span class="line">				num = input.nextInt();</span><br><span class="line">				</span><br><span class="line">			&#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">				System.out.println(<span class="string">&quot;请重新输入&quot;</span>);</span><br><span class="line">				fileOperate();</span><br><span class="line">			&#125;</span><br><span class="line">			</span><br><span class="line">			<span class="keyword">switch</span>(num)&#123;</span><br><span class="line"></span><br><span class="line">			<span class="comment">//创建文件	</span></span><br><span class="line">			<span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">				System.out.println(<span class="string">&quot;当前目录:&quot;</span>+address);</span><br><span class="line">				System.out.println(<span class="string">&quot;创建文件: &quot;</span>);</span><br><span class="line">				System.out.println(<span class="string">&quot;输入文件名字（包括后缀）：&quot;</span>);</span><br><span class="line">				fileName = input.next();</span><br><span class="line">				File f1 = <span class="keyword">new</span> File(address+fileName);</span><br><span class="line">				<span class="keyword">if</span>(f1.exists())&#123;</span><br><span class="line">					System.out.println(<span class="string">&quot;文件已经存在&quot;</span>);</span><br><span class="line">				&#125;</span><br><span class="line">				<span class="keyword">else</span>&#123;</span><br><span class="line">					<span class="keyword">try</span> &#123;</span><br><span class="line">						f1.createNewFile();</span><br><span class="line">						System.out.println(<span class="string">&quot;创建成功&quot;</span>);</span><br><span class="line">					&#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">						e.printStackTrace();</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">				System.out.println(<span class="string">&quot;操作成功&quot;</span>);</span><br><span class="line">				fileOperate();</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">				</span><br><span class="line">			<span class="comment">//读取文件	</span></span><br><span class="line">			<span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">				System.out.println(<span class="string">&quot;当前目录:&quot;</span>+address);</span><br><span class="line">				System.out.println(<span class="string">&quot;读取文件: &quot;</span>);</span><br><span class="line">				System.out.println(<span class="string">&quot;输入文件名：&quot;</span>);</span><br><span class="line">				fileName = input.next();</span><br><span class="line">				File f2 = <span class="keyword">new</span> File(address+fileName);</span><br><span class="line">				String str;</span><br><span class="line">				BufferedReader buffer = <span class="keyword">null</span>;</span><br><span class="line">				<span class="keyword">try</span> &#123;</span><br><span class="line">					FileReader ins = <span class="keyword">new</span> FileReader(f2);</span><br><span class="line">					buffer = <span class="keyword">new</span> BufferedReader(ins);</span><br><span class="line">					System.out.println(<span class="string">&quot;文件内容:&quot;</span>);</span><br><span class="line">					<span class="keyword">try</span> &#123;</span><br><span class="line">						<span class="keyword">while</span>(<span class="keyword">null</span> != (str = buffer.readLine()))&#123;</span><br><span class="line">							</span><br><span class="line">							System.out.println(str);</span><br><span class="line">						&#125;</span><br><span class="line">					&#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">						e.printStackTrace();</span><br><span class="line">					&#125;</span><br><span class="line">				&#125; <span class="keyword">catch</span> (FileNotFoundException e) &#123;</span><br><span class="line">					e.printStackTrace();</span><br><span class="line">				&#125;</span><br><span class="line">				<span class="keyword">try</span> &#123;</span><br><span class="line">					buffer.close();</span><br><span class="line">				&#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">					e.printStackTrace();</span><br><span class="line">				&#125;</span><br><span class="line">				System.out.println(<span class="string">&quot;操作成功&quot;</span>);</span><br><span class="line">				fileOperate();</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">				</span><br><span class="line">			<span class="comment">//写入文件	</span></span><br><span class="line">			<span class="keyword">case</span> <span class="number">3</span>:</span><br><span class="line">				System.out.println(<span class="string">&quot;当前目录:&quot;</span>+address);</span><br><span class="line">				System.out.println(<span class="string">&quot;写入文件: &quot;</span>);</span><br><span class="line">				System.out.println(<span class="string">&quot;输入文件名：&quot;</span>);</span><br><span class="line">				fileName = input.next();</span><br><span class="line">				File f3 = <span class="keyword">new</span> File(address+fileName);</span><br><span class="line">				System.out.println(<span class="string">&quot;输入文本内容:&quot;</span>);</span><br><span class="line">				String str1 = input.next();</span><br><span class="line">				FileWriter wrs = <span class="keyword">null</span>;</span><br><span class="line">				<span class="keyword">try</span> &#123;</span><br><span class="line">					wrs = <span class="keyword">new</span> FileWriter(f3);</span><br><span class="line">				&#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">					e.printStackTrace();</span><br><span class="line">				&#125;</span><br><span class="line">				BufferedWriter buffer3 = <span class="keyword">new</span> BufferedWriter(wrs);</span><br><span class="line">				<span class="keyword">try</span> &#123;</span><br><span class="line">					buffer3.write(str1);</span><br><span class="line">					buffer3.flush();</span><br><span class="line">				&#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">					e.printStackTrace();</span><br><span class="line">				&#125;</span><br><span class="line">				System.out.println(<span class="string">&quot;操作成功&quot;</span>);</span><br><span class="line">				fileOperate();</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">				</span><br><span class="line">			<span class="comment">//删除文件或目录	</span></span><br><span class="line">			<span class="keyword">case</span> <span class="number">4</span>:</span><br><span class="line">				System.out.println(<span class="string">&quot;当前目录:&quot;</span>+address);</span><br><span class="line">				System.out.println(<span class="string">&quot;删除文件: &quot;</span>);</span><br><span class="line">				System.out.println(<span class="string">&quot;输入文件名：&quot;</span>);</span><br><span class="line">				fileName = input.next();</span><br><span class="line">				File f4 = <span class="keyword">new</span> File(address+fileName);</span><br><span class="line">				<span class="keyword">if</span>(f4.isFile())&#123;</span><br><span class="line">					<span class="keyword">if</span>(f4.exists())&#123;</span><br><span class="line">						f4.delete();</span><br><span class="line">						System.out.println(<span class="string">&quot;文件删除成功&quot;</span>);</span><br><span class="line">					&#125;</span><br><span class="line">					<span class="keyword">else</span>&#123;</span><br><span class="line">						System.out.println(<span class="string">&quot;文件不存在&quot;</span>);</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">				<span class="keyword">else</span>&#123;</span><br><span class="line">					System.out.println(<span class="string">&quot;文件不存在&quot;</span>);</span><br><span class="line">				&#125;</span><br><span class="line">				System.out.println(<span class="string">&quot;操作成功&quot;</span>);</span><br><span class="line">				fileOperate();</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">				</span><br><span class="line">			<span class="comment">//查看文件目录</span></span><br><span class="line">			<span class="keyword">case</span> <span class="number">5</span>:</span><br><span class="line">					System.out.println(<span class="string">&quot;操作目录 ：&quot;</span>+address);</span><br><span class="line">					System.out.println(<span class="string">&quot;查看文件：&quot;</span>);</span><br><span class="line">					String[] files = file.list(); </span><br><span class="line">					<span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>;i &lt; files.length;i++)&#123;</span><br><span class="line">						File f6 = <span class="keyword">new</span> File(address+files[i]);</span><br><span class="line">						<span class="keyword">if</span>(f6.isDirectory())&#123;</span><br><span class="line">							System.out.println(<span class="string">&quot;文件夹 ：&quot;</span>+files[i]);</span><br><span class="line">						&#125;</span><br><span class="line">						<span class="keyword">else</span>&#123;</span><br><span class="line">							System.out.println(<span class="string">&quot;文件 ：&quot;</span>+files[i]);</span><br><span class="line">						&#125;</span><br><span class="line">					&#125;</span><br><span class="line">					System.out.println(<span class="string">&quot;操作成功&quot;</span>);</span><br><span class="line">					fileOperate();</span><br><span class="line">					<span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">				<span class="comment">//退出</span></span><br><span class="line">				<span class="keyword">case</span> <span class="number">6</span>:</span><br><span class="line">					System.out.println(<span class="string">&quot;程序已退出，注销成功!&quot;</span>);</span><br><span class="line">					System.exit(<span class="number">0</span>);</span><br><span class="line">					<span class="keyword">break</span>;</span><br><span class="line">				<span class="keyword">default</span>: fileOperate();</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p><code>Main.java</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> ex4;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.InputStream;</span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> java.util.Scanner;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] ars)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">new</span> Main();</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//登陆账号1，密码1</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">Main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		List&lt;User&gt; users = <span class="keyword">new</span> ArrayList&lt;User&gt;();<span class="comment">//用户集合</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;=<span class="number">10</span>;i++)&#123;<span class="comment">//添加十个用户账号密码分别是数字1-10</span></span><br><span class="line">			User user=<span class="keyword">new</span> User(String.valueOf(i),String.valueOf(i));</span><br><span class="line">			users.add(user);</span><br><span class="line">		&#125;</span><br><span class="line">		Scanner input = <span class="keyword">new</span> Scanner(System.in);</span><br><span class="line">		System.out.println(<span class="string">&quot;用户名：&quot;</span>);</span><br><span class="line">		String str = input.next();</span><br><span class="line">		<span class="keyword">for</span>(User u:users)&#123;</span><br><span class="line">			<span class="keyword">if</span>(u.getName().equals(str))&#123;</span><br><span class="line">				System.out.println(<span class="string">&quot;密码：&quot;</span>);</span><br><span class="line">				input = <span class="keyword">new</span> Scanner(System.in);</span><br><span class="line">				String password = input.next();</span><br><span class="line">					<span class="keyword">if</span>(u.getPassword().equals(password))&#123;</span><br><span class="line">						System.out.println(<span class="string">&quot;登录成功&quot;</span>);</span><br><span class="line">						FileOperation myfile = <span class="keyword">new</span> FileOperation(u.getName());</span><br><span class="line">					&#125;</span><br><span class="line">					<span class="keyword">else</span>&#123;</span><br><span class="line">						System.out.println(<span class="string">&quot;密码错误&quot;</span>);</span><br><span class="line">						<span class="keyword">new</span> Main();</span><br><span class="line">					&#125;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">else</span>&#123;</span><br><span class="line">				System.out.println(<span class="string">&quot;用户不存在&quot;</span>);</span><br><span class="line">				<span class="keyword">new</span> Main();</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		input.close();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/06/30/Web-server-with-thread-pool/" rel="prev" title="Web server with thread pool">
+      <i class="fa fa-chevron-left"></i> Web server with thread pool
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/12/17/Anti-entropy-and-Gossiping/" rel="next" title="Anti-entropy and Gossiping">
+      Anti-entropy and Gossiping <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E4%B8%80-%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%90%8C%E6%AD%A5%E4%B8%8E%E4%BA%92%E6%96%A5"><span class="nav-number">1.</span> <span class="nav-text">实验一_进程的同步与互斥</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E4%BA%8C-%E5%A4%84%E7%90%86%E6%9C%BA%E8%B0%83%E5%BA%A6"><span class="nav-number">2.</span> <span class="nav-text">实验二_处理机调度</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E4%B8%89-%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">实验三_存储管理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E5%9B%9B-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F"><span class="nav-number">4.</span> <span class="nav-text">实验四_文件系统</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John</p>
+  <div class="site-description" itemprop="description">notes of tech</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'tdS8xnPk9OcytyCavvE4Ss17-gzGzoHsz',
+      appKey     : 'P3LRc3G9C2Snqw51iIu2oUtf',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : true,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

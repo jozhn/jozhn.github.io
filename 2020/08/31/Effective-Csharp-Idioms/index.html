@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"john.js.org","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="目前网络上的《Effective C#》笔记都是基于07年出版的原书第二版的翻译版本，如今很多理论已经过时，而最新的第三版的中文版已经在18年出版，因此这里分享一下第一章节C#的编程习惯的读书笔记。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Effective C# 之 C#的编程习惯">
+<meta property="og:url" content="https://john.js.org/2020/08/31/Effective-Csharp-Idioms/index.html">
+<meta property="og:site_name" content="Dear John">
+<meta property="og:description" content="目前网络上的《Effective C#》笔记都是基于07年出版的原书第二版的翻译版本，如今很多理论已经过时，而最新的第三版的中文版已经在18年出版，因此这里分享一下第一章节C#的编程习惯的读书笔记。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-08-31T10:01:00.000Z">
+<meta property="article:modified_time" content="2021-01-30T07:46:00.128Z">
+<meta property="article:author" content="John">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://john.js.org/2020/08/31/Effective-Csharp-Idioms/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Effective C# 之 C#的编程习惯 | Dear John</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Dear John</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://john.js.org/2020/08/31/Effective-Csharp-Idioms/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John">
+      <meta itemprop="description" content="notes of tech">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Dear John">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Effective C# 之 C#的编程习惯
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-08-31 18:01:00" itemprop="dateCreated datePublished" datetime="2020-08-31T18:01:00+08:00">2020-08-31</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-30 15:46:00" itemprop="dateModified" datetime="2021-01-30T15:46:00+08:00">2021-01-30</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/08/31/Effective-Csharp-Idioms/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/08/31/Effective-Csharp-Idioms/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>目前网络上的《Effective C#》笔记都是基于07年出版的原书第二版的翻译版本，如今很多理论已经过时，而最新的第三版的中文版已经在18年出版，因此这里分享一下第一章节C#的编程习惯的读书笔记。</p>
+<a id="more"></a>
+
+<p>这本书其实主要讲的是改善C#代码的50个方法，相比《Effective C++》是有差距的，但是同样很有用。第一章节的C#编程习惯讲了一些C#编程规范。</p>
+<h2 id="1-优先使用隐式类型的局部变量"><a href="#1-优先使用隐式类型的局部变量" class="headerlink" title="1.优先使用隐式类型的局部变量"></a>1.优先使用隐式类型的局部变量</h2><p><strong>优先使用</strong>隐式类型的局部变量（注意不是总是使用），即使用<code>var</code>声明变量。</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//int count = 0;</span></span><br><span class="line"><span class="keyword">var</span> count = <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+<p>这样不需要考虑变量的类型，因为通过初始化语句往往可以直接看出。而且即使是通过方法初始化，也可以通过使用合适的变量名、方法名来方便判断。</p>
+<p>举一个具体的例子，在使用<code>LINQ</code>语句时，某些查询操作所获得结果是<code>IQueryable&lt;T&gt;</code>，而有些则返回<code>IEnumberable&lt;T&gt;</code>。如果都当做后者处理，性能上会差一些，因为<code>IQueryable&lt;T&gt;</code>对数据的查询做了优化。使用<code>var</code>来让编译器推断类型，反而获得了性能优势。</p>
+<p>具体代码如下：</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> IEnumerable&lt;<span class="built_in">string</span>&gt; <span class="title">FindCustomersStartingWith</span>(<span class="params">stirng start</span>)</span>&#123;</span><br><span class="line">    IEnumerable&lt;<span class="built_in">string</span>&gt; q = <span class="keyword">from</span> c <span class="keyword">in</span> db.Customers <span class="keyword">select</span> c.ContactName;</span><br><span class="line">    <span class="keyword">var</span> q2 = q.Where(s =&gt; s.StartsWith(start));</span><br><span class="line">    <span class="keyword">return</span> q2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这段代码有严重的性能问题。其中的查询语句会把每个人的姓名从数据库中取出，返回值实际上应该是<code>IQueryable&lt;T&gt;</code>，但开发者却保存为<code>IEnumberable&lt;T&gt;</code>，而由于<code>IQueryable&lt;T&gt;</code>继承自<code>IEnumberable&lt;T&gt;</code>，因此不会报错，但这样却导致后续代码无法使用<code>IQueryable&lt;T&gt;</code>的特性。比如下面<code>q2</code>本可以使用<code>Querable.Where</code>去查询，却使用了<code>Enumerable.Where</code>。实际上<code>IQueryable&lt;T&gt;</code>能够把数据查询相关的多个表达式树组合成一项操作，使得一次性在存放数据的远程服务器上执行完毕再返回，而<code>IEnumberable&lt;T&gt;</code>却需要查询到本地之后才能再执行第二条查询语句，一方面浪费了网络流量、另一方面大大降低了查询效率。</p>
+<p>修改为下面这样，是更简洁也更好的写法：</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> IEnumerable&lt;<span class="built_in">string</span>&gt; <span class="title">FindCustomersStartingWith</span>(<span class="params">stirng start</span>)</span>&#123;</span><br><span class="line">    <span class="keyword">var</span> q = <span class="keyword">from</span> c <span class="keyword">in</span> db.Customers <span class="keyword">select</span> c.ContactName;</span><br><span class="line">    <span class="keyword">var</span> q2 = q.Where(s =&gt; s.StartsWith(start));</span><br><span class="line">    <span class="keyword">return</span> q2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>当然，<code>var</code>也不能滥用，如果过多使用var会导致其他开发者难以理解代码类型。同时在使用数值型类型变量int、float、double等时，如果涉及到数值转换（尤其是窄化转换，如long到int），请不要使用<code>var</code>，它可能会导致精度降低。</p>
+<p>例如：</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> f = GetMagicNumber();</span><br><span class="line"><span class="keyword">var</span> total = <span class="number">100</span> * f / <span class="number">6</span>;</span><br><span class="line">Console.WriteLine(<span class="string">$&quot;Type:<span class="subst">&#123;total.GetType().Name&#125;</span>, Value:<span class="subst">&#123;total&#125;</span>&quot;</span>);</span><br></pre></td></tr></table></figure>
+<p>假设<code>GetMagicNumber()</code>返回值是10，那么<code>total</code>的值是多少取决于<code>GetMagicNumber()</code>的返回值类型。</p>
+<p>如果你不清楚<code>GetMagicNumber()</code>的返回值类型，就有可能计算出不符合需求的<code>total</code>。比如返回值是Double和Int32，那么最终的<code>total</code>分别是166.666666666667和166。</p>
+<p>这个问题其实不是<code>var f</code>和<code>var total</code>引发的，而是阅读代码的人不知道<code>GetMagicNumber()</code>的返回值类型，也不知道运行过程中<code>GetMagicNumber()</code>导致的默认的数值转换。</p>
+<p>这个例子下，使用<code>var</code>很显然可能导致代码维护困难，这类场合就不适合使用。</p>
+<p>而一般情况下，即使你明确了变量类型，也未必能确保类型安全或者保证代码更易读懂，而选择了错误的类型反而会导致程序效率降低，这样不如使用<code>var</code>让编译器自动选择。</p>
+<h2 id="2-考虑用readonly代替const"><a href="#2-考虑用readonly代替const" class="headerlink" title="2.考虑用readonly代替const"></a>2.考虑用<code>readonly</code>代替<code>const</code></h2><p>C#有两种常量，一种是编译期常量，使用<code>const</code>；另一种是运行期常量，使用<code>readonly</code>。</p>
+<p>编译期常量虽然会使得程序运行稍快那么一点点，但是远不如运行期常量灵活。只有程序性能极端重要，并且常量取值不会随版本变化时，才考虑使用<code>const</code>。</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//编译期常量</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">const</span> <span class="built_in">int</span> Millennium = <span class="number">2000</span>;</span><br><span class="line"><span class="comment">//运行期常量</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">readonly</span> <span class="built_in">int</span> thisYear = <span class="number">2004</span>;</span><br></pre></td></tr></table></figure>
+<p><code>const</code>可以在方法里声明，而<code>readonly</code>不可以。</p>
+<p>同时，两种常量支持的值也不一样，<code>const</code>只支持内置的整数、浮点数、枚举、字符串。并且<code>const</code>常量只能用数字、字符串、null来初始化。<code>readonly</code>常量执行完构造函数之后就不能再修改了，但是它是在程序运行时初始化的，因此更加灵活。</p>
+<p>其中一个好处在于，<code>readonly</code>常量的类型不受限制。比如<code>DateTime</code>类型常量，不能用<code>const</code>声明，但是可以用<code>readonly</code>声明。</p>
+<p>此外，在跨程序集使用常量时，使用<code>readonly</code>可以避免不必要的编译。</p>
+<p>例子：</p>
+<p>一个名为<code>Infra</code>的程序集中同时使用<code>const</code>和<code>readonly</code>定义常量：</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Constants</span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">readonly</span> <span class="built_in">int</span> start = <span class="number">5</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">const</span> <span class="built_in">int</span> end = <span class="number">10</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>另一个名为<code>app</code>的程序集里引用了这两个字段：</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Console.WriteLine(<span class="string">&quot;start is &#123;0&#125;&quot;</span>, Constants.start);</span><br><span class="line">Console.WriteLine(<span class="string">&quot;end is &#123;0&#125;&quot;</span>, Constants.end);</span><br></pre></td></tr></table></figure>
+<p>测试输出结果是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">start is 5</span><br><span class="line">end is 10</span><br></pre></td></tr></table></figure>
+<p>但如果过段时间修改<code>Infra</code>程序集的代码：</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Constants</span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">readonly</span> <span class="built_in">int</span> start = <span class="number">6</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">const</span> <span class="built_in">int</span> end = <span class="number">11</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>只发布新版<code>Infra</code>程序集，而<code>app</code>程序集不重新构建，那么会出现问题。</p>
+<p>你想看到的是;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">start is 6</span><br><span class="line">end is 11</span><br></pre></td></tr></table></figure>
+<p>然而结果是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">start is 6</span><br><span class="line">end is 10</span><br></pre></td></tr></table></figure>
+<p>这是因为<code>const</code>常量在<code>app</code>程序集中调用时，编译器直接写入了10这个字面量，而非引用<code>end</code>常量存放的空间。如果修改值需要重新编译所有用到该常量的代码。</p>
+<p>而<code>start</code>是<code>readonly</code>声明的，运行时才加以解析，使得不需要重新编译<code>app</code>程序集就可以看到新的常量值。</p>
+<p>不过对于版本号这种跟随程序集的常量，还是使用<code>const</code>比较好，这样修改的话不会导致其他程序集引用该值的地方都变成最新的值。</p>
+<p>总结来说，<code>const</code>适合必须在编译期确定的值，如attribute参数、switch case标签、enum定义。除此之外，都应该考虑更加灵活的<code>readonly</code>常量。</p>
+<h2 id="3-优先考虑is或as运算符，少用强制类型转换"><a href="#3-优先考虑is或as运算符，少用强制类型转换" class="headerlink" title="3.优先考虑is或as运算符，少用强制类型转换"></a>3.优先考虑is或as运算符，少用强制类型转换</h2><p>如果参数类型写成了<code>object</code>，那么可能需要把改参数转换成需要的类型才能继续编写代码。</p>
+<p>这时有两种办法，一种是使用<code>as</code>运算符，另一种是强制类型转换（cast）来绕过编译器检查。在这之前，可以使用<code>is</code>判断该操作是否合理，再使用这两种办法。</p>
+<p>其中，应该优先使用<code>as</code>运算符。这样会比强制类型转换更安全、更有效率。<code>as</code>与<code>is</code>运算符不会考虑用户定义的转换，只有当类型与要转换到的类型符合时才会顺利进行。这种类型转换操作很少会为了类型转换构建新的对象（但如果使用as运算符把装箱的值类型转换成未装箱且可为null的值类型，则会创建新对象）。</p>
+<p>下面看个具体例子：</p>
+<p>方法一：</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">object</span> o = Factory.GetObject();</span><br><span class="line">MyType t = o <span class="keyword">as</span> MyType;</span><br><span class="line"><span class="keyword">if</span>(t != <span class="literal">null</span>)&#123;</span><br><span class="line">    <span class="comment">// do sth</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>方法二：</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">object</span> o = Factory.GetObject();</span><br><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line">    MyType t = (MyType)o;</span><br><span class="line">    <span class="keyword">if</span>(t != <span class="literal">null</span>)&#123;</span><br><span class="line">        <span class="comment">// do sth</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">catch(InvalidCastException)&#123;</span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>方法一很显然比第二种更简洁，更好理解，且不需要使用<code>try/catch</code>结构，开销与代码量更低。</p>
+<p>使用方法二不仅要捕获异常，而且要判断t是不是null。因为强制类型转换遇到null并不抛出异常。而使用as操作遇到这两种情况都会返回null，这样使用<code>if(t != null)</code>就可以概括地处理了。</p>
+<p><code>as</code>运算符和强制类型转换的最大区别在于如何对待用户定义的转换。<code>as</code>与<code>is</code>运算符只会判断操作的对象在运行期是何种类型，除了必要的装箱、拆箱操作，不会执行其他额外操作。反之，强制类型转换则有可能发生用户预期之外的转换，比如数值类型之间的转换。例如可能发生long到short的转换，导致信息丢失。</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">t = (MyType)st;</span><br></pre></td></tr></table></figure>
+<p>上面这种写法，如果st声明是<code>object</code>那么可以编译，但运行会抛出异常。而换用下面这种写法，运行时不会抛出异常，只会返回null，这样也不需要额外的<code>try/catch</code>判断。</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">t = st <span class="keyword">as</span> MyType;</span><br></pre></td></tr></table></figure>
+
+
+<p>下面看一下什么情况不能用<code>as</code>。下面这种写法就无法通过编译：</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">object</span> o = Factory.GetValue();</span><br><span class="line"><span class="built_in">int</span> i = o <span class="keyword">as</span> <span class="built_in">int</span>;<span class="comment">//无法编译</span></span><br></pre></td></tr></table></figure>
+<p>因为<code>int</code>是值类型，无法保存null。当o不是<code>int</code>时，<code>as</code>执行结果时null，而<code>i</code>是<code>int</code>，无法保存null的结果，所以编译就发生错误了。有人会认为这里必须使用强制类型转换，并编写异常捕获，实际上并不需要。</p>
+<p>依然使用<code>as</code>，但是不要转为<code>int</code>，而是可以保存null的<code>int?</code>类型，同时使用<code>var</code>让编译器自己选择类型：</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">object</span> o = Factory.GetValue();</span><br><span class="line"><span class="keyword">var</span> i = o <span class="keyword">as</span> <span class="built_in">int</span>?;</span><br><span class="line"><span class="keyword">if</span>(i != <span class="literal">null</span>)&#123;</span><br><span class="line">    <span class="comment">// do sth</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>也就是说，如果<code>as</code>运算符左侧的变量是值类型或者可以为null的值类型，那么可以使用这个技巧来实现类型转换。</p>
+<p>现在再来考虑一个问题，<code>foreach</code>循环在转换类型时用的是<code>as</code>还是<code>cast</code>？这里的循环指的是非泛型<code>IEnumerable</code>序列，它会在迭代过程中自动转换类型。当然在可选的情况下，还是要尽量采用类型安全的泛型版本。<br>答案是<code>cast</code>。它会把对象从<code>object</code>类型转换成需要的类型。</p>
+<p>最后，要判断对象是不是某个类型，可以使用<code>is</code>运算符，而且该运算符遵循多态原则。</p>
+<p>总结一下，在面向对象语言中，应该尽量避免类型转换，而在必要的时刻，应该采用<code>as</code>与<code>is</code>运算符清晰地表达代码的意图。</p>
+<h2 id="4-用内插字符串取代string-Format"><a href="#4-用内插字符串取代string-Format" class="headerlink" title="4.用内插字符串取代string.Format()"></a>4.用内插字符串取代<code>string.Format()</code></h2><p>内插字符串用法：</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Console.WriteLine(<span class="string">$&quot;Pi = <span class="subst">&#123;Math.PI&#125;</span>&quot;</span>);</span><br></pre></td></tr></table></figure>
+<p>好处在于：</p>
+<ol>
+<li>相比<code>format</code>更符合人的逻辑</li>
+<li>不需要检查变量个数与顺序</li>
+</ol>
+<p>要注意的是，上述代码字符串内插操作会调用一个参数为<code>params</code>对象数组的格式化方法。而<code>Math.PI</code>是<code>double</code>类型，也是值类型，因此必须自动转换为<code>Object</code>。这样转换会导致装箱，为了避免装箱，下面的写法是更佳的操作：</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Console.WriteLine(<span class="string">$&quot;Pi = <span class="subst">&#123;Math.PI.ToString()&#125;</span>&quot;</span>);</span><br></pre></td></tr></table></figure>
+<p>如果需要格式化数值：</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Console.WriteLine(<span class="string">$&quot;Pi = <span class="subst">&#123;Math.PI.ToString(<span class="string">&quot;F2&quot;</span>)&#125;</span>&quot;</span>);</span><br></pre></td></tr></table></figure>
+<p>如果需要把返回值格式化，使用C#格式说明符如<code>:F2</code>即可：</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Console.WriteLine(<span class="string">$&quot;Pi = <span class="subst">&#123;Math.PI:F2&#125;</span>&quot;</span>);</span><br></pre></td></tr></table></figure>
+<p>如果需要用三目表达式，这样会编译错误，因为会把冒号认为是格式说明符的前导字符：</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Console.WriteLine(<span class="string">$&quot;Pi = <span class="subst">&#123;round ? Math.PI.ToString() : Math.PI.ToString(<span class="string">&quot;F2&quot;</span>) &#125;</span>&quot;</span>);</span><br></pre></td></tr></table></figure>
+<p>改成下面这样即可，加上小括号强制让编译器将其理解为条件表达式：</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Console.WriteLine(<span class="string">$&quot;Pi = <span class="subst">&#123;(round ? Math.PI.ToString() : Math.PI.ToString(<span class="string">&quot;F2&quot;</span>))&#125;</span>&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+
+<h2 id="5-避免装箱和拆箱"><a href="#5-避免装箱和拆箱" class="headerlink" title="5.避免装箱和拆箱"></a>5.避免装箱和拆箱</h2><p>C#中值类型和引用类型的最终基类都是Object类型（它本身是一个引用类型）。</p>
+<p>也就是说，值类型也可以当做引用类型来处理。而这种机制的底层处理就是通过装箱和拆箱的方式来进行，利用装箱和拆箱功能，可通过允许值类型的任何值与Object 类型的值相互转换，将值类型与引用类型链接起来 。</p>
+<p>例如：</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">int</span> val = <span class="number">100</span>; </span><br><span class="line"><span class="built_in">object</span> obj = val; </span><br><span class="line">Console.WriteLine (<span class="string">&quot;对象的值 = &#123;0&#125;&quot;</span>, obj); <span class="comment">//对象的值 = 100</span></span><br></pre></td></tr></table></figure>
+<p>这是一个装箱的过程，是将 值类型 转换为 引用类型 的过程。</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">int</span> val = <span class="number">100</span>; </span><br><span class="line"><span class="built_in">object</span> obj = val; </span><br><span class="line"><span class="built_in">int</span> num = (<span class="built_in">int</span>) obj; </span><br><span class="line">Console.WriteLine (<span class="string">&quot;num: &#123;0&#125;&quot;</span>, num); <span class="comment">//num: 100</span></span><br></pre></td></tr></table></figure>
+<p>这是一个拆箱的过程，是将值类型转换为引用类型，再由引用类型转换为值类型的过程 。<br>注：被装过箱的对象才能被拆箱。</p>
+<p>也就是说，要避免编译器把值类型转换为Object。可行的办法是手工地将值类型转为string，再传给<code>Console.WriteLine</code>。</p>
+<p>换句话说，不要在本来应该使用Object的地方使用值类型的值。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/07/30/Unity-Animation-Event-Editor/" rel="prev" title="制作 Unity Animation 事件编辑器">
+      <i class="fa fa-chevron-left"></i> 制作 Unity Animation 事件编辑器
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/10/27/Lua-Runtime-Hotfix/" rel="next" title="Lua运行时热更新的实现">
+      Lua运行时热更新的实现 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%BC%98%E5%85%88%E4%BD%BF%E7%94%A8%E9%9A%90%E5%BC%8F%E7%B1%BB%E5%9E%8B%E7%9A%84%E5%B1%80%E9%83%A8%E5%8F%98%E9%87%8F"><span class="nav-number">1.</span> <span class="nav-text">1.优先使用隐式类型的局部变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E8%80%83%E8%99%91%E7%94%A8readonly%E4%BB%A3%E6%9B%BFconst"><span class="nav-number">2.</span> <span class="nav-text">2.考虑用readonly代替const</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E4%BC%98%E5%85%88%E8%80%83%E8%99%91is%E6%88%96as%E8%BF%90%E7%AE%97%E7%AC%A6%EF%BC%8C%E5%B0%91%E7%94%A8%E5%BC%BA%E5%88%B6%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2"><span class="nav-number">3.</span> <span class="nav-text">3.优先考虑is或as运算符，少用强制类型转换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E7%94%A8%E5%86%85%E6%8F%92%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8F%96%E4%BB%A3string-Format"><span class="nav-number">4.</span> <span class="nav-text">4.用内插字符串取代string.Format()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E9%81%BF%E5%85%8D%E8%A3%85%E7%AE%B1%E5%92%8C%E6%8B%86%E7%AE%B1"><span class="nav-number">5.</span> <span class="nav-text">5.避免装箱和拆箱</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John</p>
+  <div class="site-description" itemprop="description">notes of tech</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'tdS8xnPk9OcytyCavvE4Ss17-gzGzoHsz',
+      appKey     : 'P3LRc3G9C2Snqw51iIu2oUtf',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : true,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

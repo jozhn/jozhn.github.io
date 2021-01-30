@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"john.js.org","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Unity中常用的界面是NGUI和UGUI，他们都用来创建界面，而NGUI学习成本更低。 在Unity渲染界面的时候，总体上会根据层级自下向上地渲染。其中，UIPanel的优先级最高，我们可以认为Unity首先会按照UIPanel的层级把prefab排序，而子物体们则会在UIPanel的层级上再根据层级排序。另外，即使一个UIPanel挂在另一个UIPanel的下面，也属于不同的层级。 然后由于有">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NGUI图集与Drawcall">
+<meta property="og:url" content="https://john.js.org/2019/10/16/NGUI-atlas-and-drawcall/index.html">
+<meta property="og:site_name" content="Dear John">
+<meta property="og:description" content="Unity中常用的界面是NGUI和UGUI，他们都用来创建界面，而NGUI学习成本更低。 在Unity渲染界面的时候，总体上会根据层级自下向上地渲染。其中，UIPanel的优先级最高，我们可以认为Unity首先会按照UIPanel的层级把prefab排序，而子物体们则会在UIPanel的层级上再根据层级排序。另外，即使一个UIPanel挂在另一个UIPanel的下面，也属于不同的层级。 然后由于有">
+<meta property="og:locale">
+<meta property="article:published_time" content="2019-10-16T10:20:51.000Z">
+<meta property="article:modified_time" content="2021-01-30T07:46:00.131Z">
+<meta property="article:author" content="John">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://john.js.org/2019/10/16/NGUI-atlas-and-drawcall/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>NGUI图集与Drawcall | Dear John</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Dear John</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://john.js.org/2019/10/16/NGUI-atlas-and-drawcall/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John">
+      <meta itemprop="description" content="notes of tech">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Dear John">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          NGUI图集与Drawcall
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-10-16 18:20:51" itemprop="dateCreated datePublished" datetime="2019-10-16T18:20:51+08:00">2019-10-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-30 15:46:00" itemprop="dateModified" datetime="2021-01-30T15:46:00+08:00">2021-01-30</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2019/10/16/NGUI-atlas-and-drawcall/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/10/16/NGUI-atlas-and-drawcall/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Unity中常用的界面是NGUI和UGUI，他们都用来创建界面，而NGUI学习成本更低。</p>
+<p>在Unity渲染界面的时候，总体上会根据层级自下向上地渲染。其中，UIPanel的优先级最高，我们可以认为Unity首先会按照UIPanel的层级把prefab排序，而子物体们则会在UIPanel的层级上再根据层级排序。另外，即使一个UIPanel挂在另一个UIPanel的下面，也属于不同的层级。</p>
+<p>然后由于有这样的渲染顺序，所以我们需要合理安排各个组件的层级，让使用相同美术素材的组件在接近的层级上，不同美术素材的组件尽量远一些。</p>
+<a id="more"></a>
+
+<p>举个栗子，假设我们有四个组件A、B、C、D层级分别是1、2、3、4，然后他们用的美术素材分别是E、F、E、F，那么在渲染的时候就会自底向上把A、B两个美术素材各渲染2遍，Drallcall也就是渲染次数等于4。为什么Unity这么蠢，不能自动地寻找相同美术素材的组件然后一起渲染呢？没办法，这只能靠我们自己来优化。所以我们应该把这四个组件的顺序调整成A、C、B、D，这样AC和BD就会分别一起渲染。</p>
+<h2 id="NGUI图集"><a href="#NGUI图集" class="headerlink" title="NGUI图集"></a>NGUI图集</h2><p>在Unity中我们会经常用到很多美术元素，可能有几百上千个，而同一个元素会在不同地方被多次调用，这样的话Dracall会很容易变得很高，如果我们能够让同一个界面上的美术元素都合成一张图，总体只渲染一次，那不就很完美吗？所以NGUI和UGUI都使用图集来管理图片素材。他们的思路都是把经常复用的元素放到一张图集上面。</p>
+<h2 id="UISprite"><a href="#UISprite" class="headerlink" title="UISprite"></a>UISprite</h2><p>NGUI引入图集的概念，不考虑ABA叠层的情况下，一个图集内的图片用UISprite，那么它就是一个DrawCall。但是如果你做了一个图集是1024X1024的。此时你的界面上只用了图集中的一张很小的图，那么很抱歉1024X1024这张大图都需要载入你的内存里面，1024就是4M的内存，如果你做了10个1024的图集，你的界面上刚好都只用了每个图集里面的一张小图，那么再次抱歉你的内存直接飙40M。</p>
+<h2 id="UITexture"><a href="#UITexture" class="headerlink" title="UITexture"></a>UITexture</h2><p>它完全没有图集的概念，使用起来非常的灵活，只需要把图片挂上去就行了。这样内存里只会占用你这一张图的大小，内存虽然小了但是DrawCall就上去了。因为每一张UITexture就是一次DrawCall。如果你发现你的UITexture图片大小不对了，是因为图片拖进Unity默认图片的格式会设置成Texture，它的NonPower of2 是默认打开的，所以他会缩放你的图片成2的幂次方，所以你可以把图片格式改成GUI。</p>
+<h2 id="图片格式"><a href="#图片格式" class="headerlink" title="图片格式"></a>图片格式</h2><p>NGUI生成的图集的图片格式是PNG，但是无论是什么格式的图片，Unity都会自己搞一套格式，并且打包的时候也不会用你文件夹下图片的格式，而是Unity自己的格式。如果你用UITexture你可以真对每一张图来修改它的格式，比如一些颜色数比较少的图片，你可以直接用16bit，如果你的图片没有用到透明，你可以用pvr或者etc，这样你的图片会更小。可是UISprite就不行，只要其中有一张小图用了透明，你就得用RGBA32，不然UI就会很难看，你可以自己试试。</p>
+<p>除了UITexture 和 Atlas的图片没办法以外（因为必须有透明），不是建议是必须，你的贴图无论如何都必须是2的幂次方。因为只有2的幂次方图片 并且没有透明通道才会被压缩，IOS会压缩成pvr格式，Android会压缩成ETC格式，压缩以后图片会小很多的，好几倍的小。 </p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/09/20/Unity-crash-when-exit-game/" rel="prev" title="Unity关闭游戏预览时崩溃的解决方法">
+      <i class="fa fa-chevron-left"></i> Unity关闭游戏预览时崩溃的解决方法
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/10/23/re-and-out-usage-in-CSharp/" rel="next" title="C#中ref与out的用法">
+      C#中ref与out的用法 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#NGUI%E5%9B%BE%E9%9B%86"><span class="nav-number">1.</span> <span class="nav-text">NGUI图集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UISprite"><span class="nav-number">2.</span> <span class="nav-text">UISprite</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UITexture"><span class="nav-number">3.</span> <span class="nav-text">UITexture</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%BE%E7%89%87%E6%A0%BC%E5%BC%8F"><span class="nav-number">4.</span> <span class="nav-text">图片格式</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John</p>
+  <div class="site-description" itemprop="description">notes of tech</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'tdS8xnPk9OcytyCavvE4Ss17-gzGzoHsz',
+      appKey     : 'P3LRc3G9C2Snqw51iIu2oUtf',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : true,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

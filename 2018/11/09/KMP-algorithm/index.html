@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"john.js.org","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="记录一下KMP求next和nextval数组的方法 KMP之求next数组 举例：模式串  a  b  a  a  b  c  a  cnext值  0  1  1  2  2  3  1  2">
+<meta property="og:type" content="article">
+<meta property="og:title" content="KMP模式匹配">
+<meta property="og:url" content="https://john.js.org/2018/11/09/KMP-algorithm/index.html">
+<meta property="og:site_name" content="Dear John">
+<meta property="og:description" content="记录一下KMP求next和nextval数组的方法 KMP之求next数组 举例：模式串  a  b  a  a  b  c  a  cnext值  0  1  1  2  2  3  1  2">
+<meta property="og:locale">
+<meta property="article:published_time" content="2018-11-09T14:41:57.000Z">
+<meta property="article:modified_time" content="2021-01-30T07:46:00.129Z">
+<meta property="article:author" content="John">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://john.js.org/2018/11/09/KMP-algorithm/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>KMP模式匹配 | Dear John</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Dear John</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://john.js.org/2018/11/09/KMP-algorithm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John">
+      <meta itemprop="description" content="notes of tech">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Dear John">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          KMP模式匹配
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-11-09 22:41:57" itemprop="dateCreated datePublished" datetime="2018-11-09T22:41:57+08:00">2018-11-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-30 15:46:00" itemprop="dateModified" datetime="2021-01-30T15:46:00+08:00">2021-01-30</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2018/11/09/KMP-algorithm/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/11/09/KMP-algorithm/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>记录一下KMP求next和nextval数组的方法</p>
+<h3 id="KMP之求next数组"><a href="#KMP之求next数组" class="headerlink" title="KMP之求next数组"></a>KMP之求next数组</h3><blockquote>
+<p>举例：<br>模式串  a  b  a  a  b  c  a  c<br>next值  0  1  1  2  2  3  1  2</p>
+</blockquote>
+<a id="more"></a>
+
+<p>1.　next前两位必为0，1。<br>2.　计算第三位的时候，看第二位b的next值，为1，则把b和1对应的a进行比较，不同，则第三位a的next的值为1，因为一直比到最前一位，都没有发生比较相同的现象。<br>3.　计算第四位的时候，看第三位a的next值，为1，则把a和1对应的a进行比较，相同，则第四位a的next的值为第三位a的next值加上1，为2。因为是在第三位实现了其next值对应的值与第三位的值相同。<br>4.　计算第五位的时候，看第四位a的next值，为2，则把a和2对应的b进行比较，不同，则再将b对应的next值1对应的a与第四位的a进行比较，相同，则第五位的next值为第二位b的next值加上1，为2。因为是在第二位实现了其next值对应的值与第四位的值相同。<br>5.　计算第六位的时候，看第五位b的next值，为2，则把b和2对应的b进行比较，相同，则第六位c的next值为第五位b的next值加上1，为3，因为是在第五位实现了其next值对应的值与第五位相<br>6.　计算第七位的时候，看第六位c的next值，为3，则把c和3对应的a进行比较，不同，则再把第3位a的next值1对应的a与第六位c比较，仍然不同，则第七位的next值为1。<br>7.　计算第八位的时候，看第七位a的next值，为1，则把a和1对应的a进行比较，相同，则第八位c的next值为第七位a的next值加上1，为2，因为是在第七位和实现了其next值对应的值与第七位相同。</p>
+<p><strong>总结</strong>：求解next时前两位为0,1。之后的next计算要根据前一位的字符与其next值所对应的字符比较，相同则按此规则继续向前比较直至不同，取不同的那一项的next值。</p>
+<h3 id="改进的KMP之求解nextval"><a href="#改进的KMP之求解nextval" class="headerlink" title="改进的KMP之求解nextval"></a>改进的KMP之求解nextval</h3><blockquote>
+<p>求nextval数组值有两种方法，一种是不依赖next数组值直接用观察法求得，一种方法是根据next数组值进行推理，两种方法均可使用，视更喜欢哪种方法而定。本文主要分析nextval数组值的第二种方法。</p>
+<p>例子：</p>
+<p>　模式串         a b a a b c a c<br>　next值         0 1 1 2 2 3 1 2<br>　nextval值      0 1 0 2 1 3 0 2</p>
+</blockquote>
+<ol>
+<li>第一位的nextval值必定为0，第二位如果与第一位相同则为0，如果不同则为1。</li>
+<li>第三位的next值为1，那么将第三位和第一位进行比较，均为a，相同，则第三位的nextval值为0。</li>
+<li>第四位的next值为2，那么将第四位和第二位进行比较，不同，则第四位的nextval值为其next值，为2。</li>
+<li>第五位的next值为2，那么将第五位和第二位进行比较，相同，第二位的next值为1，则继续将第二位与第一位进行比较，不同，则第五位的nextval值为第二位的next值，为1。</li>
+<li>第六位的next值为3，那么将第六位和第三位进行比较，不同，则第六位的nextval值为其next值，为3。</li>
+<li>第七位的next值为1，那么将第七位和第一位进行比较，相同，则第七位的nextval值为0。</li>
+<li>第八位的next值为2，那么将第八位和第二位进行比较，不同，则第八位的nextval值为其next值，为2。</li>
+</ol>
+<p><strong>总结</strong>：求解nextval时，第一位是0；模式串第二位若与第一位相同则nextval第二位取0，否则取1。对于此后的nextval[i]，将字符串的第i位与第next[i]位比较，如果相同，则继续按照这种方法向前比较直至不同，然后取不同的那个next值，如果一直比较到第一位无论相同与否都取0。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/07/17/QT-and-EasyPr/" rel="prev" title="QT使用EasyPR识别车牌的正确方式">
+      <i class="fa fa-chevron-left"></i> QT使用EasyPR识别车牌的正确方式
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/02/10/Windows10-with-AlphaPose/" rel="next" title="Windows10下的AlphaPose配置教程">
+      Windows10下的AlphaPose配置教程 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#KMP%E4%B9%8B%E6%B1%82next%E6%95%B0%E7%BB%84"><span class="nav-number">1.</span> <span class="nav-text">KMP之求next数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%B9%E8%BF%9B%E7%9A%84KMP%E4%B9%8B%E6%B1%82%E8%A7%A3nextval"><span class="nav-number">2.</span> <span class="nav-text">改进的KMP之求解nextval</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John</p>
+  <div class="site-description" itemprop="description">notes of tech</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'tdS8xnPk9OcytyCavvE4Ss17-gzGzoHsz',
+      appKey     : 'P3LRc3G9C2Snqw51iIu2oUtf',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : true,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
