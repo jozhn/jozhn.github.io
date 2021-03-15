@@ -28,7 +28,7 @@
 <meta property="og:description" content="互联网的产生带来了机器间通讯的需求，而互联通讯的双方需要采用约定的协议，序列化和反序列化属于通讯协议的一部分。  序列化： 将数据结构或对象转换成二进制串的过程 反序列化：将在序列化过程中所生成的二进制串转换成数据结构或者对象的过程">
 <meta property="og:locale">
 <meta property="article:published_time" content="2021-03-14T18:32:41.000Z">
-<meta property="article:modified_time" content="2021-03-14T10:36:44.773Z">
+<meta property="article:modified_time" content="2021-03-15T12:03:51.120Z">
 <meta property="article:author" content="John">
 <meta name="twitter:card" content="summary">
 
@@ -252,7 +252,7 @@
 <li><p>松散的Associative array使得其具有良好的可扩展性和兼容性。</p>
 </li>
 </ol>
-<h4 id="典型应用场景和非应用场景"><a href="#典型应用场景和非应用场景" class="headerlink" title="典型应用场景和非应用场景"></a>典型应用场景和非应用场景</h4><p>JSON在很多应用场景中可以替代XML，更简洁并且解析速度更快。典型应用场景包括：</p>
+<h3 id="典型应用场景和非应用场景"><a href="#典型应用场景和非应用场景" class="headerlink" title="典型应用场景和非应用场景"></a>典型应用场景和非应用场景</h3><p>JSON在很多应用场景中可以替代XML，更简洁并且解析速度更快。典型应用场景包括：</p>
 <p>1、公司之间传输数据量相对小，实时性要求相对低（例如秒级别）的服务。</p>
 <p>2、基于Web browser的Ajax请求。</p>
 <p>3、由于JSON具有非常强的前后兼容性，对于接口经常发生变化，并对可调式性要求高的场景，例如Mobile app与服务端的通讯。</p>
@@ -264,7 +264,7 @@
 <p>3、解析速度非常快，比对应的XML快约20-100倍。</p>
 <p>4、提供了非常友好的动态库，使用非常简介，反序列化只需要一行代码。</p>
 <p>Protobuf是一个纯粹的展示层协议，可以和各种传输层协议一起使用；Protobuf的文档也非常完善。 但是由于Protobuf产生于Google，所以目前其仅仅支持Java、C++、Python三种语言。另外Protobuf支持的数据类型相对较少，不支持常量类型。</p>
-<h4 id="典型应用场景和非应用场景-1"><a href="#典型应用场景和非应用场景-1" class="headerlink" title="典型应用场景和非应用场景"></a>典型应用场景和非应用场景</h4><p>Protobuf具有广泛的用户基础，空间开销小以及高解析性能是其亮点，非常适合于公司内部的对性能要求高的RPC调用。由于Protobuf提供了标准的IDL以及对应的编译器，其IDL文件是参与各方的非常强的业务约束，另外，Protobuf与传输层无关，采用HTTP具有良好的跨防火墙的访问属性，所以Protobuf也适用于公司间对性能要求比较高的场景。由于其解析性能高，序列化后数据量相对少，非常适合应用层对象的持久化场景。</p>
+<h3 id="典型应用场景和非应用场景-1"><a href="#典型应用场景和非应用场景-1" class="headerlink" title="典型应用场景和非应用场景"></a>典型应用场景和非应用场景</h3><p>Protobuf具有广泛的用户基础，空间开销小以及高解析性能是其亮点，非常适合于公司内部的对性能要求高的RPC调用。由于Protobuf提供了标准的IDL以及对应的编译器，其IDL文件是参与各方的非常强的业务约束，另外，Protobuf与传输层无关，采用HTTP具有良好的跨防火墙的访问属性，所以Protobuf也适用于公司间对性能要求比较高的场景。由于其解析性能高，序列化后数据量相对少，非常适合应用层对象的持久化场景。</p>
 <p>它的主要问题在于其所支持的语言相对较少，另外由于没有绑定的标准底层传输层协议，在公司间进行传输层协议的调试工作相对麻烦。</p>
 <h2 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h2><p>Protobuf 和json对比：</p>
 <p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/53339153">https://zhuanlan.zhihu.com/p/53339153</a></p>
@@ -404,7 +404,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#JSON"><span class="nav-number">1.</span> <span class="nav-text">JSON</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B8%E5%9E%8B%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E5%92%8C%E9%9D%9E%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">1.0.1.</span> <span class="nav-text">典型应用场景和非应用场景</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Protobuf"><span class="nav-number">2.</span> <span class="nav-text">Protobuf</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B8%E5%9E%8B%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E5%92%8C%E9%9D%9E%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF-1"><span class="nav-number">2.0.1.</span> <span class="nav-text">典型应用场景和非应用场景</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E6%AF%94"><span class="nav-number">3.</span> <span class="nav-text">对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Protobuf%E7%9A%84%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96"><span class="nav-number">4.</span> <span class="nav-text">Protobuf的反序列化</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#JSON"><span class="nav-number">1.</span> <span class="nav-text">JSON</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B8%E5%9E%8B%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E5%92%8C%E9%9D%9E%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">1.1.</span> <span class="nav-text">典型应用场景和非应用场景</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Protobuf"><span class="nav-number">2.</span> <span class="nav-text">Protobuf</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B8%E5%9E%8B%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E5%92%8C%E9%9D%9E%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF-1"><span class="nav-number">2.1.</span> <span class="nav-text">典型应用场景和非应用场景</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E6%AF%94"><span class="nav-number">3.</span> <span class="nav-text">对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Protobuf%E7%9A%84%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96"><span class="nav-number">4.</span> <span class="nav-text">Protobuf的反序列化</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
