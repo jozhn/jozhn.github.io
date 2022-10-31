@@ -28,7 +28,7 @@
 <meta property="og:description" content="The goals of this project are:  to understand the basic elements of the World Wide Web and its protocols. to learn how real-world multi-threaded servers are built. to apply scheduling algorithms to a">
 <meta property="og:locale">
 <meta property="article:published_time" content="2017-06-30T18:02:13.000Z">
-<meta property="article:modified_time" content="2022-07-07T03:26:14.840Z">
+<meta property="article:modified_time" content="2022-10-31T08:10:11.478Z">
 <meta property="article:author" content="John">
 <meta name="twitter:card" content="summary">
 
@@ -185,20 +185,6 @@
             </span>
 
           
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">评论数：</span>
-    
-    <a title="valine" href="/2017/06/30/Web-server-with-thread-pool/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2017/06/30/Web-server-with-thread-pool/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
 
         </div>
       </header>
@@ -258,7 +244,7 @@
 
           </div>
           
-    <div class="comments" id="valine-comments"></div>
+    <div class="comments" id="gitalk-container"></div>
 
 <script>
   window.addEventListener('tabs:register', () => {
@@ -414,32 +400,23 @@
 
   
 
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
 
 <script>
-NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
-  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
-    var GUEST = ['nick', 'mail', 'link'];
-    var guest = 'nick,mail,link';
-    guest = guest.split(',').filter(item => {
-      return GUEST.includes(item);
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'c43b310147d69008401b',
+      clientSecret: '39c17d243ebbd83135b2390f7a98257cd00c8f14',
+      repo        : 'blog-gittalk',
+      owner       : 'jozhn',
+      admin       : ['jozhn'],
+      id          : '69abebe03f984b7a09beb44125214e96',
+        language: '',
+      distractionFreeMode: true
     });
-    new Valine({
-      el         : '#valine-comments',
-      verify     : false,
-      notify     : false,
-      appId      : 'tdS8xnPk9OcytyCavvE4Ss17-gzGzoHsz',
-      appKey     : 'P3LRc3G9C2Snqw51iIu2oUtf',
-      placeholder: "Just go go",
-      avatar     : 'mm',
-      meta       : guest,
-      pageSize   : '10' || 10,
-      visitor    : false,
-      lang       : '' || 'zh-cn',
-      path       : location.pathname,
-      recordIP   : true,
-      serverURLs : ''
-    });
-  }, window.Valine);
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
 });
 </script>
 
