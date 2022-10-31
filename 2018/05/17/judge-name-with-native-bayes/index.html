@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 5.3.0">
+<meta name="generator" content="Hexo 6.3.0">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -28,7 +28,7 @@
 <meta property="og:description" content="条件概率与贝叶斯定理对于事件A和B，当B发生的情况下，A发生的条件概率为$$P(A|B) &#x3D; \frac{P(AB)}{P(B)}.$$如果把$$P(AB)$$表示为$$P(B|A)P(A)$$，那么 就有$$P(A|B) &#x3D; \frac{P(B|A)P(A)}{P(B)}.$$">
 <meta property="og:locale">
 <meta property="article:published_time" content="2018-05-17T20:42:08.000Z">
-<meta property="article:modified_time" content="2022-10-31T08:10:11.478Z">
+<meta property="article:modified_time" content="2022-10-31T08:57:15.854Z">
 <meta property="article:author" content="John">
 <meta name="twitter:card" content="summary">
 
@@ -195,14 +195,14 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h3 id="条件概率与贝叶斯定理"><a href="#条件概率与贝叶斯定理" class="headerlink" title="条件概率与贝叶斯定理"></a>条件概率与贝叶斯定理</h3><p>对于事件A和B，当B发生的情况下，A发生的条件概率为<br>$$<br>P(A|B) = \frac{P(AB)}{P(B)}.<br>$$<br>如果把$$P(AB)$$表示为$$P(B|A)P(A)$$，那么 就有<br>$$<br>P(A|B) = \frac{P(B|A)P(A)}{P(B)}.<br>$$</p>
-<a id="more"></a>
+        <h3 id="条件概率与贝叶斯定理"><a href="#条件概率与贝叶斯定理" class="headerlink" title="条件概率与贝叶斯定理"></a>条件概率与贝叶斯定理</h3><p>对于事件A和B，当B发生的情况下，A发生的条件概率为<br>$$<br>P(A|B) &#x3D; \frac{P(AB)}{P(B)}.<br>$$<br>如果把$$P(AB)$$表示为$$P(B|A)P(A)$$，那么 就有<br>$$<br>P(A|B) &#x3D; \frac{P(B|A)P(A)}{P(B)}.<br>$$</p>
+<span id="more"></span>
 
 <h3 id="朴素贝叶斯"><a href="#朴素贝叶斯" class="headerlink" title="朴素贝叶斯"></a>朴素贝叶斯</h3><p>朴素贝叶斯是一个基于贝叶斯定理的分类算法，<strong>其基本假设是所有特征是相互独立的</strong>。</p>
-<p> 举个例子来说，有一个二元分类问题，每个样本只有两个二元特征$$X1$$和$$X2$$。若已知一个样本$$(X1=1,X2=0)$$，我们要预测它的标签为1的概率，就是等价于去计算<br>$$<br>P(Y=1|X_1=1,X_2=0)<br>$$<br>根据贝叶斯定理，可以得到<br>$$<br>P(Y=1|X_1=1,X_2=0)=\frac{P(Y=1)P(X_1=1,X_2=0|Y=1)}{P(X_1=1, X_2=0)}<br>$$</p>
-<h3 id="拉普拉斯光滑"><a href="#拉普拉斯光滑" class="headerlink" title="拉普拉斯光滑"></a>拉普拉斯光滑</h3><p>“我爱机器学习”中有七个字<br>“我”的频率为：<br>$$<br>f(我)=\frac 1 7<br>$$<br>“学”的频率为：<br>$$<br>f(学)=\frac 2 7<br>$$<br>拉普拉斯光滑的公式为:<br>$$<br>g(x)=\frac{n_x+\alpha}{l+\alpha c}<br>$$</p>
+<p> 举个例子来说，有一个二元分类问题，每个样本只有两个二元特征$$X1$$和$$X2$$。若已知一个样本$$(X1&#x3D;1,X2&#x3D;0)$$，我们要预测它的标签为1的概率，就是等价于去计算<br>$$<br>P(Y&#x3D;1|X_1&#x3D;1,X_2&#x3D;0)<br>$$<br>根据贝叶斯定理，可以得到<br>$$<br>P(Y&#x3D;1|X_1&#x3D;1,X_2&#x3D;0)&#x3D;\frac{P(Y&#x3D;1)P(X_1&#x3D;1,X_2&#x3D;0|Y&#x3D;1)}{P(X_1&#x3D;1, X_2&#x3D;0)}<br>$$</p>
+<h3 id="拉普拉斯光滑"><a href="#拉普拉斯光滑" class="headerlink" title="拉普拉斯光滑"></a>拉普拉斯光滑</h3><p>“我爱机器学习”中有七个字<br>“我”的频率为：<br>$$<br>f(我)&#x3D;\frac 1 7<br>$$<br>“学”的频率为：<br>$$<br>f(学)&#x3D;\frac 2 7<br>$$<br>拉普拉斯光滑的公式为:<br>$$<br>g(x)&#x3D;\frac{n_x+\alpha}{l+\alpha c}<br>$$</p>
 <p>其中$$n_x$$是单词$$x$$出现的次数，$$l$$是句子的长度，$$c$$是句子中不同词汇的个数，$$\alpha$$是拉普拉斯光滑的光滑系数，这个是自行设定的。</p>
-<p>上面的句子里一共七个字，五个不同的字。假设我们选定$$\alpha$$=1: </p>
+<p>上面的句子里一共七个字，五个不同的字。假设我们选定$$\alpha$$&#x3D;1: </p>
 
     </div>
 

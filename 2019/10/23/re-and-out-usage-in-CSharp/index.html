@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 5.3.0">
+<meta name="generator" content="Hexo 6.3.0">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -28,7 +28,7 @@
 <meta property="og:description" content="C#中有ref和out参数，而lua是弱类型，通过xlua如何访问呢，这当然是可以实现的。">
 <meta property="og:locale">
 <meta property="article:published_time" content="2019-10-23T15:07:40.000Z">
-<meta property="article:modified_time" content="2022-10-31T08:10:11.478Z">
+<meta property="article:modified_time" content="2022-10-31T08:57:15.854Z">
 <meta property="article:author" content="John">
 <meta name="twitter:card" content="summary">
 
@@ -196,9 +196,9 @@
 
       
         <p>C#中有ref和out参数，而lua是弱类型，通过xlua如何访问呢，这当然是可以实现的。</p>
-<a id="more"></a>
+<span id="more"></span>
 
-<h2 id="ref和out"><a href="#ref和out" class="headerlink" title="ref和out"></a>ref和out</h2><p>ref和out都对函数参数采用引用传递形式——不管是值类型参数还是引用类型参数，并且定义函数和调用函数时都必须显示生命该参数为ref/out形式。两者都可以使函数传回多个结果。</p>
+<h2 id="ref和out"><a href="#ref和out" class="headerlink" title="ref和out"></a>ref和out</h2><p>ref和out都对函数参数采用引用传递形式——不管是值类型参数还是引用类型参数，并且定义函数和调用函数时都必须显示生命该参数为ref&#x2F;out形式。两者都可以使函数传回多个结果。</p>
 <p>两者区别：</p>
 <p>两种参数类型的设计思想不同，ref的目的在于将值类型参数当作引用型参数传递到函数，是函数的输入参数，并且在函数内部的任何改变也都将影响函数外部该参数的值。</p>
 <p>而out的目的在于获取函数的返回值，是输出参数，由函数内部计算得到的值再回传到函数外部，因此必须在函数内部对该参数赋值，这将冲掉函数外部的任何赋值，使得函数外部赋值毫无意义。</p>
@@ -207,7 +207,8 @@
 <li>ref必须在函数体外初始化。</li>
 <li>两者在函数体内的任何修改都将影响到函数体外面。</li>
 </ol>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="title">ConsoleApplication1</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="built_in">string</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="built_in">int</span> n1 = <span class="number">10</span>;</span><br><span class="line">            Incr(<span class="keyword">ref</span> n1);</span><br><span class="line">            Console.WriteLine(n1);</span><br><span class="line">            Decr(<span class="keyword">out</span> n1);</span><br><span class="line">            Console.WriteLine(n1);</span><br><span class="line">            Console.ReadKey();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Incr</span>(<span class="params"><span class="keyword">ref</span> <span class="built_in">int</span> n1</span>)</span> &#123;</span><br><span class="line">            n1++;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Decr</span>(<span class="params"><span class="keyword">out</span> <span class="built_in">int</span> n1</span>)</span> &#123;</span><br><span class="line">            n1 = <span class="number">1</span>;</span><br><span class="line">            n1--;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="title">ConsoleApplication1</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="built_in">string</span>[] args</span>)</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">int</span> n1 = <span class="number">10</span>;</span><br><span class="line">            Incr(<span class="keyword">ref</span> n1);</span><br><span class="line">            Console.WriteLine(n1);</span><br><span class="line">            Decr(<span class="keyword">out</span> n1);</span><br><span class="line">            Console.WriteLine(n1);</span><br><span class="line">            Console.ReadKey();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Incr</span>(<span class="params"><span class="keyword">ref</span> <span class="built_in">int</span> n1</span>)</span> &#123;</span><br><span class="line">            n1++;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Decr</span>(<span class="params"><span class="keyword">out</span> <span class="built_in">int</span> n1</span>)</span> &#123;</span><br><span class="line">            n1 = <span class="number">1</span>;</span><br><span class="line">            n1--;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>未完待续</p>
 
     </div>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 5.3.0">
+<meta name="generator" content="Hexo 6.3.0">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -29,7 +29,7 @@
 <meta property="og:locale">
 <meta property="og:image" content="https://ae01.alicdn.com/kf/Hda3510685aff4764bb0ad5ee3d1e2017W.png">
 <meta property="article:published_time" content="2017-12-27T15:27:03.000Z">
-<meta property="article:modified_time" content="2022-10-31T08:10:11.474Z">
+<meta property="article:modified_time" content="2022-10-31T08:57:15.854Z">
 <meta property="article:author" content="John">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://ae01.alicdn.com/kf/Hda3510685aff4764bb0ad5ee3d1e2017W.png">
@@ -200,7 +200,7 @@
         <h4 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h4><p>Linux操作系统作业，要求阅读一个中型程序源码，如Apache、Nginx等，写一份阅读报告，给出其运行机制，及运行机制对应关键代码。</p>
 <p>需要给出一定细节：配置参数的对运行的影响，相应的源码位置等。</p>
 <p>作业提交包括：一份报告。</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <h4 id="初步了解"><a href="#初步了解" class="headerlink" title="初步了解"></a>初步了解</h4><h5 id="Nginx的工作模式"><a href="#Nginx的工作模式" class="headerlink" title="Nginx的工作模式"></a>Nginx的工作模式</h5><p>Single模式，Master-Worker模式</p>
 <h5 id="Single模式"><a href="#Single模式" class="headerlink" title="Single模式"></a>Single模式</h5><p>只有一个工作进程，不适合生产环境</p>
@@ -211,9 +211,9 @@
 <p>NGINX的master进程，负责解析配置文件，并启动其他角色的进程，如启动worker，cache manager。</p>
 <p>启动完成其他进程之后，master进程仅起监视作用（相当与monitor角色），后面用户可以通过singaller角色的nginx向master发命令， master再通知它创建起来的其他进程。</p>
 <p><strong>Worker 进程</strong></p>
-<p>worker进程是实际服务客户的进程。包括接受新连接（accept），相应连接上的消息（read/write）.</p>
+<p>worker进程是实际服务客户的进程。包括接受新连接（accept），相应连接上的消息（read&#x2F;write）.</p>
 <p><strong>Singaller 进程</strong></p>
-<p>singaller进程仅仅是一个向master进程发送信号的工具进程。 通过向master发生特定消息，能够让： * master/worker完成当前服务后，正常退出。 * master进程重新加载配置文件，或者重启worker。 * 重新打开log 文件。</p>
+<p>singaller进程仅仅是一个向master进程发送信号的工具进程。 通过向master发生特定消息，能够让： * master&#x2F;worker完成当前服务后，正常退出。 * master进程重新加载配置文件，或者重启worker。 * 重新打开log 文件。</p>
 <p><strong>Cache manager</strong></p>
 <p>可以做 HTTP、文件缓存，即对同一个静态文件的请求进行缓存。</p>
 

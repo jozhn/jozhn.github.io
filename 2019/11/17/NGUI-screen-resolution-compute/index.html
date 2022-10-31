@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 5.3.0">
+<meta name="generator" content="Hexo 6.3.0">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -28,7 +28,7 @@
 <meta property="og:description" content="NGUI中的屏幕尺寸是设计者决定的，那么在不同的手机或者电脑下是怎么适配的呢？研究了半天，下面记录一下研究的结果。">
 <meta property="og:locale">
 <meta property="article:published_time" content="2019-11-17T20:07:40.000Z">
-<meta property="article:modified_time" content="2022-10-31T08:10:11.474Z">
+<meta property="article:modified_time" content="2022-10-31T08:57:15.854Z">
 <meta property="article:author" content="John">
 <meta name="twitter:card" content="summary">
 
@@ -196,10 +196,10 @@
 
       
         <p>NGUI中的屏幕尺寸是设计者决定的，那么在不同的手机或者电脑下是怎么适配的呢？研究了半天，下面记录一下研究的结果。</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <h2 id="设计尺寸"><a href="#设计尺寸" class="headerlink" title="设计尺寸"></a>设计尺寸</h2><p>设计尺寸是NGUI中UI Root上设置的宽和高，一般会设置Scaling Style为Constrained On Mobiles，这样在手机上运行的时候会根据手机实际的尺寸以及宽高比进行适配。下面的Content Width和Height就是设计尺寸的宽和高，本文以1366 * 768为例。</p>
-<h2 id="宽高比"><a href="#宽高比" class="headerlink" title="宽高比"></a>宽高比</h2><p>宽高比就是宽比高,1366/768也就是<strong>1.7786</strong>，而手机的分辨率各种各样，宽高比各不相同，在适配之前都需要计算一下宽高比，以此来确定适配方式。</p>
+<h2 id="宽高比"><a href="#宽高比" class="headerlink" title="宽高比"></a>宽高比</h2><p>宽高比就是宽比高,1366&#x2F;768也就是<strong>1.7786</strong>，而手机的分辨率各种各样，宽高比各不相同，在适配之前都需要计算一下宽高比，以此来确定适配方式。</p>
 <h2 id="适配原理"><a href="#适配原理" class="headerlink" title="适配原理"></a>适配原理</h2><p>设计的尺寸是1366 * 768，接近16:9的宽高比，那么假如说手机是1920 * 1080的分辨率，该怎么显示游戏画面呢？</p>
 <p>很显然1366 * 768是比1920 * 1080小的，总不可能把1366 * 768的游戏画面按照实际分辨率显示在手机上，那也太丑了。</p>
 <p>我们先计算1920 * 1080的宽高比，算出来是1.7778，正好等于16:9，比1366 * 768的宽高比略小，也就是<strong>相对来说</strong>，1920 * 1080的宽没有1366 * 768的宽那么长。</p>

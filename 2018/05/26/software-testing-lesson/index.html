@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 5.3.0">
+<meta name="generator" content="Hexo 6.3.0">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -65,7 +65,7 @@
 <meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-7c460efd22f11f17.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/556">
 <meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-ac03996d0f381bfc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/236">
 <meta property="article:published_time" content="2018-05-26T19:33:32.000Z">
-<meta property="article:modified_time" content="2022-10-31T08:10:11.478Z">
+<meta property="article:modified_time" content="2022-10-31T08:57:15.854Z">
 <meta property="article:author" content="John">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/3403753-78e8f6ae632311b1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/459">
@@ -237,7 +237,7 @@
 <h2 id="一、软件测试介绍"><a href="#一、软件测试介绍" class="headerlink" title="一、软件测试介绍"></a><strong>一、软件测试介绍</strong></h2><p><strong>软件缺陷的概念</strong></p>
 <p>从产品内部看，软件缺陷是产品开发或维护过程中所存在的错误、毛病等各种问题。</p>
 <p>从产品外部看，软件缺陷是系统所需要实现的某种功能的失效或者违背。</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <p><strong>软件测试的一个重要功能</strong></p>
 <p>verification(验证）and validation(确认)</p>
@@ -277,16 +277,16 @@
 <p>分为有效类和无效类，两者不能有重叠的部分</p>
 <p><strong>例子</strong>：写出 NextDate Function（ 1812≤year≤2015 ）的等价类</p>
 <p><strong>有效等价类</strong></p>
-<p>M1 = {month：1≤month≤12}</p>
-<p>D1 = {date：1≤date≤31}</p>
-<p>Y1 = {year：1812≤year≤2015}</p>
+<p>M1 &#x3D; {month：1≤month≤12}</p>
+<p>D1 &#x3D; {date：1≤date≤31}</p>
+<p>Y1 &#x3D; {year：1812≤year≤2015}</p>
 <p><strong>无效等价类</strong></p>
-<p>M2 = {month：month&lt;1}</p>
-<p>M3 = {month：month&gt;12}</p>
-<p>D2 = {date：date&lt;1}</p>
-<p>D3 = {date：date&gt;31}</p>
-<p>Y2 = {year：year&lt;1812}</p>
-<p>Y3 = {year：year&gt;2015}</p>
+<p>M2 &#x3D; {month：month&lt;1}</p>
+<p>M3 &#x3D; {month：month&gt;12}</p>
+<p>D2 &#x3D; {date：date&lt;1}</p>
+<p>D3 &#x3D; {date：date&gt;31}</p>
+<p>Y2 &#x3D; {year：year&lt;1812}</p>
+<p>Y3 &#x3D; {year：year&gt;2015}</p>
 <p><strong>再例如</strong>：有一个报表处理系统，要求用户输入处理报表的日期。假如日期限制在2000年1月至2020年12月，即系统只能对该段时期内的报表进行处理。如果用户输入的日期不在这个范围内，则显示“错误信息”。并且此系统规定日期由年月的6位数字组成，前四位代表年，后两位代表月。要求划分日期的等价类。</p>
 <p> 等价类：</p>
 <p> <img src="https://upload-images.jianshu.io/upload_images/3403753-b55f16c32b08d5f5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/512" alt="img"> </p>
@@ -301,9 +301,9 @@
 <p>1 ≤ b ≤ 200</p>
 <p>1 ≤ c ≤ 200</p>
 <p>所以a,b,c的取值是</p>
-<p>a = {1，2，100，199，200}</p>
-<p>b = {1，2，100，199，200}</p>
-<p>c = {1，2，100，199，200}</p>
+<p>a &#x3D; {1，2，100，199，200}</p>
+<p>b &#x3D; {1，2，100，199，200}</p>
+<p>c &#x3D; {1，2，100，199，200}</p>
 <p><img src="https://upload-images.jianshu.io/upload_images/3403753-65d425801fdf9bde.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/444" alt="3403753-65d425801fdf9bde"> </p>
 <p>测试用例如下</p>
 <p><strong>小结总结</strong></p>
@@ -367,23 +367,21 @@
 <p>因果图（Cause-EffectGraphing）提供了一个把规格转化为判定表的系统化方法，从该图中可以产生测试数据。其中原因是表示输入条件，结果是对输入执行的一系列计算后得到的输出。因果图方法最终生成的就是判定表，它适合于检查程序输入条件的各种组合情况。</p>
 <p><strong>因果图中基本符号介绍（这里可以看PPT，不全部列出）</strong> </p>
 <ol>
-<li>等价 implication<br>if C1 is 1，then E1 is 1 also，else E1 is 0.<br><img src="https://upload-images.jianshu.io/upload_images/6436460-df1631c54e33e741.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></li>
-</ol>
-<ol start="2">
-<li>非 not<br>if C1 is 1，then E1is 0，else E1 is 1.<br><img src="https://upload-images.jianshu.io/upload_images/6436460-8a945ec7f5bc3c3e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></li>
-</ol>
-<ol start="3">
-<li><p>或 or<br>if C1or C2 or C3 is 1，then E1 is 1，else E1is 0；“Or” may have arbitrary number of inputs.<br><img src="https://upload-images.jianshu.io/upload_images/6436460-6ed75d202ccb403b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+<li><p>等价 implication<br>  if C1 is 1，then E1 is 1 also，else E1 is 0.<br>  <img src="https://upload-images.jianshu.io/upload_images/6436460-df1631c54e33e741.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
 </li>
-<li><p>与 and<br>if both C1 and C2 are 1，then E1is1，else E1is 0；“And” may have arbitrary number of input.<br><img src="https://upload-images.jianshu.io/upload_images/6436460-d5e0697ec4c3ab3c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+<li><p>非 not<br>  if C1 is 1，then E1is 0，else E1 is 1.<br>  <img src="https://upload-images.jianshu.io/upload_images/6436460-8a945ec7f5bc3c3e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
 </li>
-<li><p>异 exclusive<br>either C1 or C2<br><img src="https://upload-images.jianshu.io/upload_images/6436460-445ccb3c63bcc930.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+<li><p>或 or<br>  if C1or C2 or C3 is 1，then E1 is 1，else E1is 0；“Or” may have arbitrary number of inputs.<br>  <img src="https://upload-images.jianshu.io/upload_images/6436460-6ed75d202ccb403b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
 </li>
-<li><p>唯一 one and only one<br>one, and only one, of C1 and C2<br><img src="https://upload-images.jianshu.io/upload_images/6436460-dca3582a9e0486b2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+<li><p>与 and<br>  if both C1 and C2 are 1，then E1is1，else E1is 0；“And” may have arbitrary number of input.<br>  <img src="https://upload-images.jianshu.io/upload_images/6436460-d5e0697ec4c3ab3c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
 </li>
-<li><p>要求 require<br>C1 requires C2<br><img src="https://upload-images.jianshu.io/upload_images/6436460-2e82f88c04302bff.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+<li><p>异 exclusive<br>  either C1 or C2<br>  <img src="https://upload-images.jianshu.io/upload_images/6436460-445ccb3c63bcc930.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
 </li>
-<li><p>强制 masking<br>E1 masks E2<br><img src="https://upload-images.jianshu.io/upload_images/6436460-452fd59c365bbd0c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+<li><p>唯一 one and only one<br>  one, and only one, of C1 and C2<br>  <img src="https://upload-images.jianshu.io/upload_images/6436460-dca3582a9e0486b2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+</li>
+<li><p>要求 require<br>  C1 requires C2<br>  <img src="https://upload-images.jianshu.io/upload_images/6436460-2e82f88c04302bff.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+</li>
+<li><p>强制 masking<br>  E1 masks E2<br>  <img src="https://upload-images.jianshu.io/upload_images/6436460-452fd59c365bbd0c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
 </li>
 </ol>
 <p><strong>因果图分析步骤</strong><br>第一步，找出Cause（原因）</p>
@@ -406,10 +404,10 @@
 <p>C3：三年以上老客户</p>
 <p><strong>结果</strong>（注意对立的就不要再写了）：</p>
 <p>E1：无折扣</p>
-<p>E2：折扣=5%</p>
-<p>E3：折扣=10%</p>
-<p>E4：折扣=15%</p>
-<p><strong>因果图**</strong></p>
+<p>E2：折扣&#x3D;5%</p>
+<p>E3：折扣&#x3D;10%</p>
+<p>E4：折扣&#x3D;15%</p>
+<p><strong>因果图</strong>**</p>
 <p>从这个图中你就能找出导出上边说的四种结果的逻辑</p>
 <p><img src="https://upload-images.jianshu.io/upload_images/3403753-f783504f8108d10a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/557" alt="img"> </p>
 <h2 id="三、白盒测试"><a href="#三、白盒测试" class="headerlink" title="三、白盒测试"></a>三、白盒测试</h2><p>白盒测试（white-box testing）也叫structural testing, clear box testing, and glass box testing. </p>
@@ -420,14 +418,15 @@
 <p>we can’t use exhaustive（详尽的） testing</p>
 <p><strong>动态测试之逻辑覆盖</strong></p>
 <p>白盒测试用例设计的一个很重要的评估标准就是对代码的覆盖度。一说到覆盖，大家都感觉非常熟悉，但是常见的覆盖都有哪些？各自有什么优缺点？在白盒测试的用例设计中我们应该如何自如地运用呢？为大家总结了一下几种常见的覆盖以及各自的优缺点。</p>
-<p>白盒测试中常见的覆盖有六种：语句覆盖、判定覆盖、条件覆盖、判定/条件覆盖、组合覆盖和路径覆盖。下面我们就分别看看这几种不同的覆盖究竟是什么鬼。</p>
+<p>白盒测试中常见的覆盖有六种：语句覆盖、判定覆盖、条件覆盖、判定&#x2F;条件覆盖、组合覆盖和路径覆盖。下面我们就分别看看这几种不同的覆盖究竟是什么鬼。</p>
 <h3 id="语句覆盖"><a href="#语句覆盖" class="headerlink" title="语句覆盖"></a>语句覆盖</h3><p>（Statement Coverage）</p>
 <p>语句覆盖，顾名思义就是针对代码语句的嘛。它的含义是我们设计出来的测试用例要保证程序中的每一个语句至少被执行一次。通常语句覆盖被认为是“最弱的覆盖”，原因是它仅仅考虑对代码中的执行语句进行覆盖而没有考虑各种条件和分支，因此在实际运用中语句覆盖很难发现代码中的问题。举个非常简单的例子：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">foo</span><span class="params">(<span class="keyword">int</span> a,<span class="keyword">int</span> b)</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> a/b;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public <span class="type">int</span> <span class="title function_">foo</span><span class="params">(<span class="type">int</span> a,<span class="type">int</span> b)</span></span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> a/b;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>这是一个求两数之商的函数。如果我们设计如下的测试用例：</p>
-<p>TestCase: a = 2, b = 1</p>
+<p>TestCase: a &#x3D; 2, b &#x3D; 1</p>
 <p>这时候我们会发现，该函数的代码覆盖率达到了100%，并且设计的case可以顺利通过测试。</p>
-<p>但是显然该函数有一个很明显的bug：当 b=0 时，会抛出异常。</p>
+<p>但是显然该函数有一个很明显的bug：当 b&#x3D;0 时，会抛出异常。</p>
 <p><strong>再来看这个例子：</strong> </p>
 <p><img src="https://upload-images.jianshu.io/upload_images/3403753-2924aef22f6da42b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/482" alt="img"> </p>
 <p><strong>主要特点</strong>：语句覆盖是最起码的结构覆盖要求，语句覆盖要求设计足够多的测试用例，使得程序中每条语句至少被执行一次。</p>
@@ -439,44 +438,44 @@
 <p>判定覆盖也被成为分支覆盖(Branch Coverage)，也就是说设计的测试用例要保证让被测试程序中的<strong>每一个分支都至少执行一次</strong>。举个例子,有如下流程图：</p>
 <p><img src="https://upload-images.jianshu.io/upload_images/3403753-f341f35792bf0be8.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/563" alt="img"> </p>
 <p>针对该图我们想要做到判定覆盖，可以设计如下case：</p>
-<p>TestCase1: a=1, b=1  (路径：ab)</p>
-<p>TestCase2: a=-1, b=-1  (路径：acd)</p>
-<p>TestCase3: a=2, b=-1  (路径：ace)</p>
+<p>TestCase1: a&#x3D;1, b&#x3D;1  (路径：ab)</p>
+<p>TestCase2: a&#x3D;-1, b&#x3D;-1  (路径：acd)</p>
+<p>TestCase3: a&#x3D;2, b&#x3D;-1  (路径：ace)</p>
 <p>判定覆盖比语句覆盖强一些，能发现一些语句覆盖无法发现的问题。但是往往一些判定条件都是由多个逻辑条件组合而成的，进行分支判断时相当于对整个组合的最终结果进行判断，这样就会忽略每个条件的取值情况，导致遗漏部分测试路径。</p>
 <p><strong>用例设计</strong></p>
 <p><img src="https://upload-images.jianshu.io/upload_images/3403753-7a815fde0eb93910.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/678" alt="img"> </p>
 <p><strong>优点</strong>：判定覆盖比语句覆盖要多几乎一倍的测试路径，当然也就具有比语句覆盖更强的测试能力。同样判定覆盖也具有和语句覆盖一样的简单性，无须细分每个判定就可以得到测试用例。</p>
-<p><strong>缺点</strong>：往往大部分的判定语句是由<strong>多个逻辑条件组合</strong>（也就是可能if(a==b&amp;&amp;c==d)这种的逻辑组合）而成（如，判定语句中包含AND、OR、CASE），若仅仅判断其整个最终结果，而忽略每个条件的取值情况，必然会遗漏部分测试路径。</p>
+<p><strong>缺点</strong>：往往大部分的判定语句是由<strong>多个逻辑条件组合</strong>（也就是可能if(a&#x3D;&#x3D;b&amp;&amp;c&#x3D;&#x3D;d)这种的逻辑组合）而成（如，判定语句中包含AND、OR、CASE），若仅仅判断其整个最终结果，而忽略每个条件的取值情况，必然会遗漏部分测试路径。</p>
 <h3 id="条件覆盖"><a href="#条件覆盖" class="headerlink" title="条件覆盖"></a>条件覆盖</h3><p>（Condition Coverage）</p>
 <p>条件覆盖于分支覆盖不同，条件覆盖要求所设计的测试用例能使每个判定中的每一个条件都获得可能的取值，即<strong>每个条件至少有一次真值、有一次假值</strong>。</p>
 <p>仍然以上面<strong>流程图2</strong>作为例子来说明。上图中涉及到的条件一共有4个：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a&gt;0, a&lt;0, b&gt;0, b&lt;0</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a&gt;0, a&lt;0, b&gt;0, b&lt;0</span><br></pre></td></tr></table></figure>
 <p>为了达到条件覆盖的目的，我们设计的用例需要在 a 点有：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a&gt;0, a&lt;&#x3D;0, b&gt;0, b&gt;&#x3D;0，</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a&gt;0, a&lt;=0, b&gt;0, b&gt;=0，</span><br></pre></td></tr></table></figure>
 <p>这些情况出现，并且在 c 点有：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a&lt;0, a&gt;&#x3D;0, b&lt;0, b&gt;&#x3D;0</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a&lt;0, a&gt;=0, b&lt;0, b&gt;=0</span><br></pre></td></tr></table></figure>
 <p>这些情况出现。现在可以设计如下用例：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">TestCase1: a&#x3D;1, b&#x3D;1  (路径：ab)</span><br><span class="line"></span><br><span class="line">TestCase1: a&#x3D;-1, b&#x3D;-1  (路径：acd)</span><br><span class="line"></span><br><span class="line">TestCase1: a&#x3D;-1, b&#x3D;0  (路径：ace)</span><br><span class="line"></span><br><span class="line">TestCase1: a&#x3D;1, b&#x3D;-1  (路径：ace)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">TestCase1: a=1, b=1  (路径：ab)</span><br><span class="line"></span><br><span class="line">TestCase1: a=-1, b=-1  (路径：acd)</span><br><span class="line"></span><br><span class="line">TestCase1: a=-1, b=0  (路径：ace)</span><br><span class="line"></span><br><span class="line">TestCase1: a=1, b=-1  (路径：ace)</span><br></pre></td></tr></table></figure>
 <p>通常而言条件覆盖比判定覆盖强，因为条件覆盖使得判定中的每一个条件都取到了不同的结果，这一点判定覆盖则无法保证。但条件覆盖也有缺陷，因为它只能保证每个条件都取到了不同结果，但没有考虑到判定结果，因此有时候条件覆盖并不能保证判定覆盖。</p>
 <p><strong>优点</strong>：显然条件覆盖比判定覆盖，增加了对符合判定情况的测试，增加了测试路径。</p>
 <p><strong>缺点</strong>：要达到条件覆盖，需要足够多的测试用例，但条件覆盖并不能保证判定覆盖。条件覆盖只能保证每个条件至少有一次为真，而不考虑所有的判定结果。</p>
-<h3 id="判定条件覆盖"><a href="#判定条件覆盖" class="headerlink" title="判定条件覆盖"></a>判定条件覆盖</h3><p>（Decision/Condition Coverage）</p>
+<h3 id="判定条件覆盖"><a href="#判定条件覆盖" class="headerlink" title="判定条件覆盖"></a>判定条件覆盖</h3><p>（Decision&#x2F;Condition Coverage）</p>
 <p><strong>针对流程图1的测试用例</strong></p>
 <p>主要特点：设计足够多的测试用例，使得判定中每个条件的所有可能结果至少出现一次，每个判定本身所有可能结果也至少出现一次。</p>
 <p><img src="https://upload-images.jianshu.io/upload_images/3403753-3af3f96dc838f2d1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/692" alt="img"> </p>
-<p><strong>优点</strong>：判定/条件覆盖满足判定覆盖准则和条件覆盖准则，弥补了二者的不足。</p>
-<p><strong>缺点</strong>：判定/条件覆盖准则的缺点是未考虑条件的组合情况。</p>
+<p><strong>优点</strong>：判定&#x2F;条件覆盖满足判定覆盖准则和条件覆盖准则，弥补了二者的不足。</p>
+<p><strong>缺点</strong>：判定&#x2F;条件覆盖准则的缺点是未考虑条件的组合情况。</p>
 <h3 id="组合覆盖"><a href="#组合覆盖" class="headerlink" title="组合覆盖"></a>组合覆盖</h3><p>（Branch Condition Combination Coverage）</p>
 <p>组合覆盖也叫做条件组合覆盖。意思是说我们设计的测试用例应该使得每个判定中的各个条件的各种可能组合都至少出现一次。显然，满足条件组合覆盖的测试用例一定是满足判定覆盖、条件覆盖和判定条件覆盖的。</p>
 <p>主要特点：要求设计足够多的测试用例，使得每个判定中条件结果的所有可能组合至少出现一次。</p>
 <p>针对前文提到的<strong>流程图2</strong>，做条件组合覆盖时我们可以设计如下用例：</p>
-<p>TestCase1: a=1, b=1  (路径：ab)</p>
-<p>TestCase1: a=-1, b=-1  (路径：acd)</p>
-<p>TestCase1: a=-1, b=0  (路径：ace)</p>
-<p>TestCase1: a=1, b=-1  (路径：ace)</p>
+<p>TestCase1: a&#x3D;1, b&#x3D;1  (路径：ab)</p>
+<p>TestCase1: a&#x3D;-1, b&#x3D;-1  (路径：acd)</p>
+<p>TestCase1: a&#x3D;-1, b&#x3D;0  (路径：ace)</p>
+<p>TestCase1: a&#x3D;1, b&#x3D;-1  (路径：ace)</p>
 <p><strong>针对流程图1的测试用例</strong></p>
 <p><img src="https://upload-images.jianshu.io/upload_images/3403753-7e79cc90a955c2fd.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/661" alt="img"> </p>
-<p><strong>优点</strong>：多重条件覆盖准则满足判定覆盖、条件覆盖和判定/条件覆盖准则。更改的判定/条件覆盖要求设计足够多的测试用例，使得判定中每个条件的所有可能结果至少出现一次，每个判定本身的所有可能结果也至少出现一次。并且每个条件都显示能单独影响判定结果。</p>
+<p><strong>优点</strong>：多重条件覆盖准则满足判定覆盖、条件覆盖和判定&#x2F;条件覆盖准则。更改的判定&#x2F;条件覆盖要求设计足够多的测试用例，使得判定中每个条件的所有可能结果至少出现一次，每个判定本身的所有可能结果也至少出现一次。并且每个条件都显示能单独影响判定结果。</p>
 <p><strong>缺点</strong>：线性地增加了测试用例的数量。</p>
 <h3 id="路径覆盖"><a href="#路径覆盖" class="headerlink" title="路径覆盖"></a>路径覆盖</h3><p>路径覆盖，意思是说我们设计的测试用例可以覆盖程序中所有可能的执行路径。这种覆盖方法可以对程序进行彻底的测试用例覆盖，比前面讲的五种方法覆盖度都要高。那么这种方法是不是就一定最好呢？当然不能讲得这么绝对，它的缺点也是显而易见的：由于需要对所有可能的路径全部进行覆盖，那么我们需要设计数量非常巨大的而且较为复杂的测试用例，用例数量将呈现指数级的增长。所以理论上来讲路径覆盖是最彻底的测试用例覆盖，但实际上很多时候路径覆盖的可操作性不强。</p>
 <p> <strong>针对流程图1</strong> </p>
@@ -491,16 +490,16 @@
 <p><img src="https://upload-images.jianshu.io/upload_images/3403753-d304fb2d7159f5e5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/359" alt="img"> </p>
 <p>将上述程序转为控制流图</p>
 <p><img src="https://upload-images.jianshu.io/upload_images/3403753-5df3401dc1fa1826.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/269" alt="img"> </p>
-<p><strong>公式</strong>：圈复杂度（独立路径数）= 闭合区域数目= 二值判定节点数+1 = 边数-节点数+2</p>
+<p><strong>公式</strong>：圈复杂度（独立路径数）&#x3D; 闭合区域数目&#x3D; 二值判定节点数+1 &#x3D; 边数-节点数+2</p>
 <p>注：闭合区域指将平面分成的区域，即包括外面无限大的部分</p>
 <p><strong>例子</strong>：</p>
 <p>计算下图的圈复杂度</p>
 <p>标识它的独立路径</p>
 <p><img src="https://upload-images.jianshu.io/upload_images/3403753-9956b51233f34570.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/309" alt="img"> </p>
 <p><strong>独立路径是指程序中至少引进一个新的处理语句集合，采用流图的术语，即独立路径必须至少包含一条在定义路径之前不曾用到的边。</strong> </p>
-<p>圈复杂度（独立路径数）=判定节点数（5）+1= 6</p>
-<p>独立路径数= 闭合区域个数= 6</p>
-<p>独立路径数= e – n + 2 = 13 – 9 + 2 = 6 （e为边数，n为结点数 ）</p>
+<p>圈复杂度（独立路径数）&#x3D;判定节点数（5）+1&#x3D; 6</p>
+<p>独立路径数&#x3D; 闭合区域个数&#x3D; 6</p>
+<p>独立路径数&#x3D; e – n + 2 &#x3D; 13 – 9 + 2 &#x3D; 6 （e为边数，n为结点数 ）</p>
 <p><strong>独立路径</strong>：</p>
 <p>ABCFG</p>
 <p>ABCDFG</p>
@@ -510,9 +509,9 @@
 <p>ABEFGABEFG</p>
 <p><strong>再比如</strong></p>
 <p><img src="https://upload-images.jianshu.io/upload_images/3403753-90131cbc7c78141b.gif?imageMogr2/auto-orient/strip%7CimageView2/2/w/510" alt="img"> </p>
-<p><strong>复杂度</strong>=闭合区域数=4</p>
-<p>=二值判定节点数+1=3+1=4</p>
-<p>=e-n+2=11-9+2=4</p>
+<p><strong>复杂度</strong>&#x3D;闭合区域数&#x3D;4</p>
+<p>&#x3D;二值判定节点数+1&#x3D;3+1&#x3D;4</p>
+<p>&#x3D;e-n+2&#x3D;11-9+2&#x3D;4</p>
 <p><strong>独立路径</strong></p>
 <p>1-11</p>
 <p>1-2-3-4-5-10-1-11</p>
@@ -539,11 +538,13 @@
 <p>单元级、集成级、规范级 </p>
 <p><strong>下面用一个例子来解释什么是变异测试，考虑以下代码片段：</strong> </p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(a &amp;&amp; b)  c = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">else</span> c = <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+
 <p>条件运算符如果用||来替换&amp;&amp;，就会产生以下变异： </p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(a || b) c = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">else</span> c = <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+
 <p>为了防止这种突变，测试需要满足以下条件：</p>
 <ol>
-<li>测试数据必须对突变和原始程序引起的不同状态覆盖。如：a=1,b=0可以达到目的。</li>
+<li>测试数据必须对突变和原始程序引起的不同状态覆盖。如：a&#x3D;1,b&#x3D;0可以达到目的。</li>
 <li>c的值应该传播到程序输出，并被测试检查。</li>
 </ol>
 <p>弱突变覆盖需满足1，强突变覆盖需满足1、2。</p>
@@ -597,7 +598,7 @@
 <ul>
 <li>早期显示控制和判断要点。 </li>
 <li>采用深度优先装配，可以首先实现和验证完整的软件功能。</li>
-<li>最多只需要一个驱动程序模块。 支持故障隔离。 </li>
+<li>最多只需要一个驱动程序模块。 支持故障隔离。</li>
 </ul>
 <p><strong>缺点</strong></p>
 <ul>
@@ -631,7 +632,7 @@
 <h2 id="七、性能测试"><a href="#七、性能测试" class="headerlink" title="七、性能测试"></a>七、性能测试</h2><p>性能是量度系统或组件在一定约束条件下，是否达到功能设计的指标：如响应速度，计算的精度，内存利用率。</p>
 <p>性能是系统外部的质量属性基于用户的需求和用户的系统操作性的看法。</p>
 <p>同时性能特别应用于对实时系统的评价当中,就是它的行为在指定的期限内完成正确的操作。</p>
-<p><strong>评估指标为时间效率，空间效率，I∕O性能，数据库性能，内存性能，初始化∕退出时间和资源利用率**</strong>延时，事务处理时间，最大事务处理时间，事务操作时间，数据库性能，最大消耗的内存量，高峰内存时间，资源消耗。**</p>
+<p><strong>评估指标为时间效率，空间效率，I∕O性能，数据库性能，内存性能，初始化∕退出时间和资源利用率****延时，事务处理时间，最大事务处理时间，事务操作时间，数据库性能，最大消耗的内存量，高峰内存时间，资源消耗。</strong></p>
 <p><strong>下图描述了web应用的页面响应时间的分解。</strong></p>
 <p><img src="https://upload-images.jianshu.io/upload_images/3403753-82175e213519f1c3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/518" alt="img"> </p>
 <p>页面响应时间分解为网络传输时间（N1+N2+N3+N4）和应用延迟时间（A1+A2+A3），</p>
@@ -642,13 +643,13 @@
 <p>严格意义的并发，即所有用户在同一时间做同一件事情或者操作。</p>
 <p>广义范围的并发，多个用户对系统发出了请求或进行了操作，但这些操作可以是相同的，也可以是不同的。</p>
 <p><strong>吞吐量：</strong>是指在一次性能测试过程中网络上传输数据量的总和。</p>
-<p>一般来说，吞吐量用请求数/秒或页面数/秒来衡量。</p>
+<p>一般来说，吞吐量用请求数&#x2F;秒或页面数&#x2F;秒来衡量。</p>
 <p><strong>吞吐量指标有如下两个作用：</strong></p>
 <p>1、协助设计性能测试场景，衡量性能测试场景是否达到了预期的设计目标。</p>
 <p>在设计性能测试场景时，根据估算吞吐量数据测试场景事物发生频率。</p>
 <p>2、协助分析性能测试瓶颈。</p>
 <p><strong>性能测试比较关注业务并发用户数，从业务的角度设置多少并发数合理。</strong></p>
-<p>下面给出估算<strong>并发用户数</strong>的公式：C=nL／T</p>
+<p>下面给出估算<strong>并发用户数</strong>的公式：C&#x3D;nL／T</p>
 <p>C —平均的并发用户数</p>
 <p>n —登录会话的数量</p>
 <p>L —登录会话的平均长度</p>
@@ -657,7 +658,7 @@
 <p><img src="https://upload-images.jianshu.io/upload_images/3403753-7c460efd22f11f17.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/556" alt="img"> </p>
 <p><strong>例题</strong>：</p>
 <p>一个软件系统每天约有400个用户访问。用户在一天之内有8小时内使用该系统，从登录到退出的平均时间为4小时，请计算该系统的并发用户数和并发用户的峰值各是多少？</p>
-<p>分析：根据公式C=400×4／8=200</p>
+<p>分析：根据公式C&#x3D;400×4／8&#x3D;200</p>
 <p><img src="https://upload-images.jianshu.io/upload_images/3403753-ac03996d0f381bfc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/236" alt="img"></p>
 <p><strong>负载测试</strong>是模拟实际软件系统所承受的负载条件的系统负荷，通过不断加载（不断增加模拟用户数量）或其他加载方式来观察不同负载下系统响应时间和数据吞吐量，系统资源占有率（cpu和内存）等性能指标，以检验系统的行为和特性，发现系统可能存在的性能瓶颈、内存泄露和不能实现同步等问题。</p>
 <p><strong>高低突变加载</strong>：某个时间用户数量很大，突然降到很低，过一段时间，又突然加到很高，反复几次。借助这种负载方式的测试，容易发现资源的释放和内存泄漏的问题。</p>

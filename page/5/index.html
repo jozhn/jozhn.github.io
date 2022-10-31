@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 5.3.0">
+<meta name="generator" content="Hexo 6.3.0">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -196,7 +196,7 @@
           <h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><blockquote>
 <p>N个节点，使用P2P方法，分别写出使用anti-entropy和gossiping传播模型的求分布式平均数算法。</p>
 </blockquote>
-<h4 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h4><p><strong>anti-entropy</strong>是基于gossip的一种流行的传播模型，在模型中，节点P随机选择另一节点Q，然后交换更新信息，交换更新信息的方法有三种：push、pull和push-pull，书上说push-pull最好，因此就使用push-pull的方法。<br><strong>gossiping</strong>也叫rumor spreading(流言传播)，是anti-entropy的一个特殊变体。区别就是P与Q通信时如果发现Q已经被另外的节点更新了，那么P可能不再传播该信息的概率为1/k，比如k=4时遇到这种情况，下一次仍然传播的概率就变为3/4。</p>
+<h4 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h4><p><strong>anti-entropy</strong>是基于gossip的一种流行的传播模型，在模型中，节点P随机选择另一节点Q，然后交换更新信息，交换更新信息的方法有三种：push、pull和push-pull，书上说push-pull最好，因此就使用push-pull的方法。<br><strong>gossiping</strong>也叫rumor spreading(流言传播)，是anti-entropy的一个特殊变体。区别就是P与Q通信时如果发现Q已经被另外的节点更新了，那么P可能不再传播该信息的概率为1&#x2F;k，比如k&#x3D;4时遇到这种情况，下一次仍然传播的概率就变为3&#x2F;4。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2017/12/17/Anti-entropy-and-Gossiping/#more" rel="contents">
@@ -263,7 +263,7 @@
       
           <p>记录操作系统课程的几个实验</p>
 <h4 id="实验一-进程的同步与互斥"><a href="#实验一-进程的同步与互斥" class="headerlink" title="实验一_进程的同步与互斥"></a>实验一_进程的同步与互斥</h4><blockquote>
-<p>通过学习和分析基础例子程序，使用windows进程和线程编程（也可以采用Java 或Unix/Linux的POSIX线程编程）实现一个简单的生产者/消费者问题的程序。</p>
+<p>通过学习和分析基础例子程序，使用windows进程和线程编程（也可以采用Java 或Unix&#x2F;Linux的POSIX线程编程）实现一个简单的生产者&#x2F;消费者问题的程序。</p>
 </blockquote>
           <!--noindex-->
             <div class="post-button">

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 5.3.0">
+<meta name="generator" content="Hexo 6.3.0">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -30,7 +30,7 @@
 <meta property="og:image" content="https://i.loli.net/2019/09/11/s2cYet4brkK5fm9.jpg">
 <meta property="og:image" content="https://i.loli.net/2019/09/11/hfvzpntQsFMRZg2.jpg">
 <meta property="article:published_time" content="2018-06-09T19:39:24.000Z">
-<meta property="article:modified_time" content="2022-10-31T08:10:11.478Z">
+<meta property="article:modified_time" content="2022-10-31T08:57:15.854Z">
 <meta property="article:author" content="John">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://i.loli.net/2019/09/11/s2cYet4brkK5fm9.jpg">
@@ -199,7 +199,7 @@
 
       
         <p>本项目使用领先的推荐系统Java开源工具库<code>LibRec</code>完成，实现其中的<code>UserKNN</code>算法，并使用<code>struts2</code>框架完成简单的网页展示。</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <h2 id="Prerequisites"><a href="#Prerequisites" class="headerlink" title="Prerequisites"></a>Prerequisites</h2><ul>
 <li>JDK 1.7</li>
@@ -211,8 +211,8 @@
 <h2 id="Algorithm"><a href="#Algorithm" class="headerlink" title="Algorithm"></a>Algorithm</h2><p>本项目的算法使用的是基于协同过滤的<code>User-based KNN</code>算法。基本思想就是，如果你喜欢某几部电影，而另外一个人也喜欢这几部电影，并且他还喜欢A电影，则你也很有可能喜欢A电影。</p>
 <p>因此算法的原理就是先找到与目标用户相似的用户集合，然后找到集合中用户喜欢的并且目标用户没有评价过的物品推荐给他。</p>
 <h4 id="计算相似度"><a href="#计算相似度" class="headerlink" title="计算相似度"></a>计算相似度</h4><p>该算法通常使用Jaccard公式或余弦相似度计算两个用户之间的相似度。</p>
-<p><strong>Jaccard:</strong><br>$$<br>W_{uv}=\frac{ |N(u)\cap N(v)| }{ |N(u)\cup N(v)| }<br>$$</p>
-<p><strong>余弦相似度:</strong><br>$$<br>W_{uv}=\frac{ |N(u)\cap N(v)| } {\sqrt { |N(u)\cup N(v)| }}<br>$$</p>
+<p><strong>Jaccard:</strong><br>$$<br>W_{uv}&#x3D;\frac{ |N(u)\cap N(v)| }{ |N(u)\cup N(v)| }<br>$$</p>
+<p><strong>余弦相似度:</strong><br>$$<br>W_{uv}&#x3D;\frac{ |N(u)\cap N(v)| } {\sqrt { |N(u)\cup N(v)| }}<br>$$</p>
 <p>假设用户<strong>ABCD</strong>与物品<strong>abcde</strong>的关系如下：</p>
 <table>
 <thead>
@@ -354,7 +354,7 @@
 </tbody></table>
 <p>####推荐物品</p>
 <p>首先从矩阵中找出与目标用户 $$u $$最相似的 K 个用户，用集合$$ S(u, K) $$表示，将$$ S $$中用户喜欢的物品全部提取出来，并去除$$ u$$ 已经喜欢的物品。</p>
-<p>对于每个候选物品$$ i $$，用户$$ u $$对它感兴趣的程度用如下公式计算：<br>$$<br>p(u,i)=\sum_{v\in S(u,K)\cap N(i)}{w_{uv} \times r_{vi}}<br>$$<br>其中$$r_{vi}$$表示用户$$ v $$对$$ i$$ 的喜欢程度，在本例中都是为 1，在一些需要用户给予评分的推荐系统中，则要代入用户评分。</p>
+<p>对于每个候选物品$$ i $$，用户$$ u $$对它感兴趣的程度用如下公式计算：<br>$$<br>p(u,i)&#x3D;\sum_{v\in S(u,K)\cap N(i)}{w_{uv} \times r_{vi}}<br>$$<br>其中$$r_{vi}$$表示用户$$ v $$对$$ i$$ 的喜欢程度，在本例中都是为 1，在一些需要用户给予评分的推荐系统中，则要代入用户评分。</p>
 <p>这样，就能计算出任意目标用户对其他物品可能的的喜欢程度了，按照得分排序就能得到推荐的物品列表。</p>
 <h2 id="Installation"><a href="#Installation" class="headerlink" title="Installation"></a>Installation</h2><p>导入项目到eclipse中，部署到TomCat即可。</p>
 <h2 id="Configuration"><a href="#Configuration" class="headerlink" title="Configuration"></a>Configuration</h2><p><strong>Datasets:</strong> </p>

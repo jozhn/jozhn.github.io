@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 5.3.0">
+<meta name="generator" content="Hexo 6.3.0">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -28,7 +28,7 @@
 <meta property="og:description" content="Unity中常用的界面是NGUI和UGUI，他们都用来创建界面，而NGUI学习成本更低。 在Unity渲染界面的时候，总体上会根据层级自下向上地渲染。其中，UIPanel的优先级最高，我们可以认为Unity首先会按照UIPanel的层级把prefab排序，而子物体们则会在UIPanel的层级上再根据层级排序。另外，即使一个UIPanel挂在另一个UIPanel的下面，也属于不同的层级。 然后由于有">
 <meta property="og:locale">
 <meta property="article:published_time" content="2019-10-16T18:20:51.000Z">
-<meta property="article:modified_time" content="2022-10-31T08:10:11.474Z">
+<meta property="article:modified_time" content="2022-10-31T08:57:15.854Z">
 <meta property="article:author" content="John">
 <meta name="twitter:card" content="summary">
 
@@ -198,7 +198,7 @@
         <p>Unity中常用的界面是NGUI和UGUI，他们都用来创建界面，而NGUI学习成本更低。</p>
 <p>在Unity渲染界面的时候，总体上会根据层级自下向上地渲染。其中，UIPanel的优先级最高，我们可以认为Unity首先会按照UIPanel的层级把prefab排序，而子物体们则会在UIPanel的层级上再根据层级排序。另外，即使一个UIPanel挂在另一个UIPanel的下面，也属于不同的层级。</p>
 <p>然后由于有这样的渲染顺序，所以我们需要合理安排各个组件的层级，让使用相同美术素材的组件在接近的层级上，不同美术素材的组件尽量远一些。</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <p>举个栗子，假设我们有四个组件A、B、C、D层级分别是1、2、3、4，然后他们用的美术素材分别是E、F、E、F，那么在渲染的时候就会自底向上把A、B两个美术素材各渲染2遍，Drallcall也就是渲染次数等于4。为什么Unity这么蠢，不能自动地寻找相同美术素材的组件然后一起渲染呢？没办法，这只能靠我们自己来优化。所以我们应该把这四个组件的顺序调整成A、C、B、D，这样AC和BD就会分别一起渲染。</p>
 <h2 id="NGUI图集"><a href="#NGUI图集" class="headerlink" title="NGUI图集"></a>NGUI图集</h2><p>在Unity中我们会经常用到很多美术元素，可能有几百上千个，而同一个元素会在不同地方被多次调用，这样的话Dracall会很容易变得很高，如果我们能够让同一个界面上的美术元素都合成一张图，总体只渲染一次，那不就很完美吗？所以NGUI和UGUI都使用图集来管理图片素材。他们的思路都是把经常复用的元素放到一张图集上面。</p>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 5.3.0">
+<meta name="generator" content="Hexo 6.3.0">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -28,7 +28,7 @@
 <meta property="og:description" content="记录一下KMP求next和nextval数组的方法 KMP之求next数组 举例：模式串  a  b  a  a  b  c  a  cnext值  0  1  1  2  2  3  1  2">
 <meta property="og:locale">
 <meta property="article:published_time" content="2018-11-09T22:41:57.000Z">
-<meta property="article:modified_time" content="2022-10-31T08:10:11.474Z">
+<meta property="article:modified_time" content="2022-10-31T08:57:15.854Z">
 <meta property="article:author" content="John">
 <meta name="twitter:card" content="summary">
 
@@ -199,14 +199,14 @@
 <h3 id="KMP之求next数组"><a href="#KMP之求next数组" class="headerlink" title="KMP之求next数组"></a>KMP之求next数组</h3><blockquote>
 <p>举例：<br>模式串  a  b  a  a  b  c  a  c<br>next值  0  1  1  2  2  3  1  2</p>
 </blockquote>
-<a id="more"></a>
+<span id="more"></span>
 
 <p>1.　next前两位必为0，1。<br>2.　计算第三位的时候，看第二位b的next值，为1，则把b和1对应的a进行比较，不同，则第三位a的next的值为1，因为一直比到最前一位，都没有发生比较相同的现象。<br>3.　计算第四位的时候，看第三位a的next值，为1，则把a和1对应的a进行比较，相同，则第四位a的next的值为第三位a的next值加上1，为2。因为是在第三位实现了其next值对应的值与第三位的值相同。<br>4.　计算第五位的时候，看第四位a的next值，为2，则把a和2对应的b进行比较，不同，则再将b对应的next值1对应的a与第四位的a进行比较，相同，则第五位的next值为第二位b的next值加上1，为2。因为是在第二位实现了其next值对应的值与第四位的值相同。<br>5.　计算第六位的时候，看第五位b的next值，为2，则把b和2对应的b进行比较，相同，则第六位c的next值为第五位b的next值加上1，为3，因为是在第五位实现了其next值对应的值与第五位相<br>6.　计算第七位的时候，看第六位c的next值，为3，则把c和3对应的a进行比较，不同，则再把第3位a的next值1对应的a与第六位c比较，仍然不同，则第七位的next值为1。<br>7.　计算第八位的时候，看第七位a的next值，为1，则把a和1对应的a进行比较，相同，则第八位c的next值为第七位a的next值加上1，为2，因为是在第七位和实现了其next值对应的值与第七位相同。</p>
 <p><strong>总结</strong>：求解next时前两位为0,1。之后的next计算要根据前一位的字符与其next值所对应的字符比较，相同则按此规则继续向前比较直至不同，取不同的那一项的next值。</p>
 <h3 id="改进的KMP之求解nextval"><a href="#改进的KMP之求解nextval" class="headerlink" title="改进的KMP之求解nextval"></a>改进的KMP之求解nextval</h3><blockquote>
 <p>求nextval数组值有两种方法，一种是不依赖next数组值直接用观察法求得，一种方法是根据next数组值进行推理，两种方法均可使用，视更喜欢哪种方法而定。本文主要分析nextval数组值的第二种方法。</p>
 <p>例子：</p>
-<p>　模式串         a b a a b c a c<br>　next值         0 1 1 2 2 3 1 2<br>　nextval值      0 1 0 2 1 3 0 2</p>
+<p>　模式串         a b a a b c a c<br>　next值         0 1 1 2 2 3 1 2<br>　nextval值 	 0 1 0 2 1 3 0 2</p>
 </blockquote>
 <ol>
 <li>第一位的nextval值必定为0，第二位如果与第一位相同则为0，如果不同则为1。</li>
