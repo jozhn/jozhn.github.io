@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha256-AbA177XfpSnFEvgpYu1jMygiLabzPCJCRIBtR5jGc0k=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"john.js.org","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.13.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Unity 的 Animator Controller 在游戏中一般用来做动画状态机，存放一个游戏中人物或物体的各种动画，便于程序调用。 由于很多人物的动画状态机结构基本一致，我们在使用时常常直接复制 Animator Controller 或者复制其中的节点到另外一个 Animator Controller 中。 但实际操作中，这样会产生冗余数据和不必要的引用关系。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Unity Animator Controller复制产生的冗余依赖">
+<meta property="og:url" content="https://john.js.org/2020/07/30/Old-Unity-Animator-Bug-of-Copy/index.html">
+<meta property="og:site_name" content="Dear John">
+<meta property="og:description" content="Unity 的 Animator Controller 在游戏中一般用来做动画状态机，存放一个游戏中人物或物体的各种动画，便于程序调用。 由于很多人物的动画状态机结构基本一致，我们在使用时常常直接复制 Animator Controller 或者复制其中的节点到另外一个 Animator Controller 中。 但实际操作中，这样会产生冗余数据和不必要的引用关系。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://p.pstatp.com/origin/ffdc0001c6c3c317afc5">
+<meta property="og:image" content="https://p.pstatp.com/origin/137c3000099e629332923">
+<meta property="og:image" content="https://p.pstatp.com/origin/ffbc0002061f3dd09f44">
+<meta property="og:image" content="https://p.pstatp.com/origin/137810000487c41bd8c88">
+<meta property="og:image" content="https://p.pstatp.com/origin/13776000090c10aa1c02c">
+<meta property="article:published_time" content="2020-07-30T15:01:00.000Z">
+<meta property="article:modified_time" content="2022-11-02T08:39:58.031Z">
+<meta property="article:author" content="John">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://p.pstatp.com/origin/ffdc0001c6c3c317afc5">
+
+
+<link rel="canonical" href="https://john.js.org/2020/07/30/Old-Unity-Animator-Bug-of-Copy/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://john.js.org/2020/07/30/Old-Unity-Animator-Bug-of-Copy/","path":"2020/07/30/Old-Unity-Animator-Bug-of-Copy/","title":"Unity Animator Controller复制产生的冗余依赖"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Unity Animator Controller复制产生的冗余依赖 | Dear John</title>
+  
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Dear John</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9F%A5%E6%89%BEguid"><span class="nav-number">2.</span> <span class="nav-text">查找guid</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0"><span class="nav-number">3.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">解决办法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%8B%E5%B7%A5"><span class="nav-number">4.1.</span> <span class="nav-text">手工</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%84%9A%E6%9C%AC"><span class="nav-number">4.2.</span> <span class="nav-text">脚本</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John</p>
+  <div class="site-description" itemprop="description">notes of tech</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">44</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jozhn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jozhn" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jozhn@live.com" title="E-Mail → mailto:jozhn@live.com" rel="noopener" target="_blank"><i class="envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://john.js.org/2020/07/30/Old-Unity-Animator-Bug-of-Copy/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Dear John">
+      <meta itemprop="description" content="notes of tech">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Unity Animator Controller复制产生的冗余依赖 | Dear John">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Unity Animator Controller复制产生的冗余依赖
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-07-30 15:01:00" itemprop="dateCreated datePublished" datetime="2020-07-30T15:01:00+00:00">2020-07-30</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>Unity 的 Animator Controller 在游戏中一般用来做动画状态机，存放一个游戏中人物或物体的各种动画，便于程序调用。</p>
+<p>由于很多人物的动画状态机结构基本一致，我们在使用时常常直接复制 Animator Controller 或者复制其中的节点到另外一个 Animator Controller 中。</p>
+<p>但实际操作中，这样会产生冗余数据和不必要的引用关系。</p>
+<span id="more"></span>
+
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p><img src="https://p.pstatp.com/origin/ffdc0001c6c3c317afc5" alt="image-20200730150643361"></p>
+<p>如图，在导出名为12100的Animator Controller 时，选择包含引用时，会同时导出名为17001的Animator Controller。</p>
+<p>然而实际上打开12100，视图里面并没有17001的animation节点，即使把所有节点都删除再保存，重新导出依然有17001的引用。</p>
+<h2 id="查找guid"><a href="#查找guid" class="headerlink" title="查找guid"></a>查找guid</h2><p>打开17001的meta文件，找到它的guid，然后在12100的Controller文件中搜索，可以发现一个AnimatorStateTransition关联了这个guid。</p>
+<p><img src="https://p.pstatp.com/origin/137c3000099e629332923" alt="image-20200730162337228"></p>
+<p>关联的内容是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">m_DstState: &#123;fileID: 1102131212858548580, guid: df538bb3c58384d4b83ab1cdbb708854,</span><br><span class="line">    type: 2&#125;</span><br></pre></td></tr></table></figure>
+
+<p>改成：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">m_DstState: &#123;fileID: 0&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样再保存，引用关系就解除了。</p>
+<p>再次导出就没有多余的引用了。</p>
+<p><img src="https://p.pstatp.com/origin/ffbc0002061f3dd09f44" alt="image-20200730163042936"></p>
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>这个问题产生的原因是复制17001，在此基础上制作了12001，因此12001包含了17001的引用。</p>
+<p>上面是大概的原因，下面讲一下冗余依赖产生的具体原因。</p>
+<p>假如有两个Animator Controller 文件，分别名为<code>a.controller</code>和<code>b.controller</code> 。</p>
+<p><code>a.controller</code> 中的状态如下：</p>
+<p><img src="https://p.pstatp.com/origin/137810000487c41bd8c88" alt="技术分享"></p>
+<p>可以看到Attack01指向Attack02。</p>
+<p>当拷贝了包含Transitions并且该Transitions的Dst State不存在的Animator State到另一个Animator Controller时，就会出现游离依赖数据。以<code>a.controller</code>为例，查看该文件能够发现Attack01节点包含的Transitions数据：</p>
+<p><img src="https://p.pstatp.com/origin/13776000090c10aa1c02c" alt="技术分享"></p>
+<p>该Transition的Dst State为Attack02。如果我们拷贝<strong>Attack01</strong>但没有拷贝<strong>Attack02</strong>到<code>b.controller</code>，那么<code>b.controller</code>中就出现了游离依赖数据m_DstState。</p>
+<p>并且这个数据我们在视图中看不到，也删不掉，随着拷贝次数增加，冗余数据会越来越多，甚至会造成循环依赖。如果这两个Controller都是AssetBundle的话，就会产生无限依赖加载。</p>
+<h2 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h2><h3 id="手工"><a href="#手工" class="headerlink" title="手工"></a>手工</h3><p>不使用直接复制来制作新的Animator Controller ，只通过工具生成空的Animator Controller 。</p>
+<p>在遇到冗余引用时，暂时只能找到荣誉动画的meta，找到guid然后再有冗余的Controller中查找删除。</p>
+<p>如果是引用了多余的Animator Controller：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">m_DstState: &#123;fileID: 0&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果是引用了多余的Animation：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">m_Motion: &#123;fileID: 0&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="脚本"><a href="#脚本" class="headerlink" title="脚本"></a>脚本</h3><p>通过之前的游离依赖数据分析可知他们的共性为m_DstState项包含了所依赖的.controller文件的guid，因此我们可以通过读取.controller文件将这些游离依赖数据删除。</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System.IO;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> UnityEditor;</span><br><span class="line"><span class="keyword">using</span> UnityEditor.Animations;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">AnimatorChecker</span></span><br><span class="line">&#123;</span><br><span class="line">    [<span class="meta">MenuItem(<span class="string">&quot;美术工具/Animator Controller/清除冗余引用数据&quot;</span>)</span>]</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">CorrectData</span>()</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">string</span> block = <span class="literal">null</span>;</span><br><span class="line">        <span class="built_in">bool</span> isDependOtherAnimatorController = <span class="literal">false</span>;</span><br><span class="line">        AnimatorController animatorController = Selection.activeObject <span class="keyword">as</span> AnimatorController;</span><br><span class="line">        <span class="built_in">string</span> filePathName = Path.GetFullPath(AssetDatabase.GetAssetPath(animatorController));</span><br><span class="line">        <span class="built_in">string</span> tempFilePathName = Application.dataPath + <span class="string">&quot;/&quot;</span> + System.DateTime.Now.Ticks.ToString() + <span class="string">&quot;.controller&quot;</span>;</span><br><span class="line">        <span class="keyword">using</span> (StreamWriter writer = File.CreateText(tempFilePathName))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">using</span> (StreamReader reader = File.OpenText(filePathName))</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="built_in">string</span> content;</span><br><span class="line">                <span class="keyword">while</span> (<span class="literal">null</span> != (content = reader.ReadLine()))</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">if</span> (content.StartsWith(<span class="string">&quot;--- !u&quot;</span>))</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="keyword">if</span> (!<span class="built_in">string</span>.IsNullOrEmpty(block))</span><br><span class="line">                            writer.Write(block);</span><br><span class="line"></span><br><span class="line">                        block = content + System.Environment.NewLine;</span><br><span class="line">                        isDependOtherAnimatorController = <span class="literal">false</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">else</span></span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="keyword">if</span> (isDependOtherAnimatorController)</span><br><span class="line">                            <span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">                        <span class="keyword">if</span> (<span class="built_in">string</span>.IsNullOrEmpty(block))</span><br><span class="line">                            writer.WriteLine(content);</span><br><span class="line">                        <span class="keyword">else</span></span><br><span class="line">                        &#123;</span><br><span class="line">                            block += (content + System.Environment.NewLine);</span><br><span class="line"></span><br><span class="line">                            <span class="comment">// 检测是否依赖其他的Animator Controller</span></span><br><span class="line">                            <span class="keyword">if</span> (content.Contains(<span class="string">&quot;m_DstState:&quot;</span>) &amp;&amp; content.Contains(<span class="string">&quot;guid&quot;</span>))</span><br><span class="line">                            &#123;</span><br><span class="line">                                block = <span class="literal">null</span>;</span><br><span class="line">                                isDependOtherAnimatorController = <span class="literal">true</span>;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// 写入最后的数据</span></span><br><span class="line">                <span class="keyword">if</span> (!<span class="built_in">string</span>.IsNullOrEmpty(block))</span><br><span class="line">                    writer.Write(block);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        FileUtil.ReplaceFile(tempFilePathName, filePathName);</span><br><span class="line">        AssetDatabase.Refresh();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    [<span class="meta">MenuItem(<span class="string">&quot;美术工具/Animator Controller/查找Animator Controller引用&quot;</span>)</span>]</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">CollectAnimatorControllerDependencies</span>()</span></span><br><span class="line">    &#123;</span><br><span class="line">        AnimatorController animatorController = Selection.activeObject <span class="keyword">as</span> AnimatorController;</span><br><span class="line">        <span class="built_in">string</span>[] dependencyArray = AssetDatabase.GetDependencies(AssetDatabase.GetAssetPath(animatorController));</span><br><span class="line"></span><br><span class="line">        Debug.Log(<span class="string">&quot;************************* Animator Controller Dependencies (&quot;</span> + animatorController.name + <span class="string">&quot;) *************************&quot;</span>);</span><br><span class="line">        <span class="keyword">foreach</span> (<span class="built_in">string</span> dependency <span class="keyword">in</span> dependencyArray)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (dependency.EndsWith(<span class="string">&quot;.controller&quot;</span>))</span><br><span class="line">                Debug.Log(dependency);</span><br><span class="line">        &#125;</span><br><span class="line">        Debug.Log(<span class="string">&quot;************************************************* End *************************************************&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    [<span class="meta">MenuItem(<span class="string">&quot;美术工具/Animator Controller/查找所有Animator Controller引用&quot;</span>)</span>]</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">CheckAnimatorControllerDependencies</span>()</span></span><br><span class="line">    &#123;</span><br><span class="line">        List&lt;<span class="built_in">string</span>&gt; dependencyCheckNameList = <span class="keyword">new</span> List&lt;<span class="built_in">string</span>&gt;();</span><br><span class="line">        <span class="built_in">string</span>[] filePathNameArray = Directory.GetFiles(Application.dataPath + <span class="string">&quot;/Content/Animator&quot;</span>, <span class="string">&quot;*.controller&quot;</span>, SearchOption.TopDirectoryOnly);</span><br><span class="line">        <span class="keyword">foreach</span> (<span class="built_in">string</span> filePathName <span class="keyword">in</span> filePathNameArray)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">string</span>[] dependencyArray = AssetDatabase.GetDependencies(filePathName.Substring(filePathName.IndexOf(<span class="string">&quot;/Assets/&quot;</span>) + <span class="number">1</span>));</span><br><span class="line">            <span class="keyword">foreach</span> (<span class="built_in">string</span> dependency <span class="keyword">in</span> dependencyArray)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (dependency.EndsWith(<span class="string">&quot;.controller&quot;</span>))</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="built_in">string</span> assetName = Path.GetFileNameWithoutExtension(filePathName);</span><br><span class="line">                    <span class="built_in">string</span> dependencyName = Path.GetFileNameWithoutExtension(dependency);</span><br><span class="line"></span><br><span class="line">                    <span class="comment">// A依赖于B，如果&quot;B_A&quot;存在，表示B也依赖于A，则是循环依赖</span></span><br><span class="line">                    <span class="built_in">string</span> checkName = dependencyName + <span class="string">&quot;_&quot;</span> + assetName;</span><br><span class="line">                    <span class="keyword">if</span> (dependencyCheckNameList.Contains(checkName))</span><br><span class="line">                        Debug.Log(Path.GetFileName(filePathName) + <span class="string">&quot; and &quot;</span> + Path.GetFileName(dependency) + <span class="string">&quot; depend each other&quot;</span>);</span><br><span class="line"></span><br><span class="line">                    dependencyCheckNameList.Add(assetName + <span class="string">&quot;_&quot;</span> + dependencyName);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    [<span class="meta">MenuItem(<span class="string">&quot;美术工具/Animator Controller/清除冗余引用数据&quot;</span>, true)</span>]</span><br><span class="line">    [<span class="meta">MenuItem(<span class="string">&quot;美术工具/Animator Controller/查找Animator Controller引用&quot;</span>, true)</span>]</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="built_in">bool</span> <span class="title">ValidateCorrectData</span>()</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> Selection.activeObject <span class="keyword">is</span> AnimatorController;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/twjcnblog/p/7663048.html">https://www.cnblogs.com/twjcnblog/p/7663048.html</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/06/06/Old-union-find-algorithm/" rel="prev" title="并查集原理与应用">
+                  <i class="fa fa-chevron-left"></i> 并查集原理与应用
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/07/30/Old-Unity-Animation-Event-Editor/" rel="next" title="制作 Unity Animation 事件编辑器">
+                  制作 Unity Animation 事件编辑器 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"jozhn/blog-utterances","issue_term":"pathname","theme":"github-light"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

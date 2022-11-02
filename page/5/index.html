@@ -149,7 +149,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">43</span>
+          <span class="site-state-item-count">44</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -196,7 +196,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://john.js.org/2017/12/17/Anti-entropy-and-Gossiping/">
+    <link itemprop="mainEntityOfPage" href="https://john.js.org/2017/12/18/Old-Linux-basics/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -214,7 +214,85 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2017/12/17/Anti-entropy-and-Gossiping/" class="post-title-link" itemprop="url">Anti-entropy and Gossiping</a>
+          <a href="/2017/12/18/Old-Linux-basics/" class="post-title-link" itemprop="url">Linux入门</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2017-12-18 21:12:08" itemprop="dateCreated datePublished" datetime="2017-12-18T21:12:08+00:00">2017-12-18</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="熟悉Linux环境"><a href="#熟悉Linux环境" class="headerlink" title="熟悉Linux环境"></a>熟悉Linux环境</h3><h4 id="常用Shell命令"><a href="#常用Shell命令" class="headerlink" title="常用Shell命令"></a>常用Shell命令</h4><ul>
+<li>目录操作<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mkdir abc //创建一个目录 abc</span><br><span class="line">cd /abc //将工作目录改变到 abc</span><br><span class="line">cd //改变当前目录到主目录</span><br><span class="line">ls //列出当前目录的内容</span><br><span class="line">ls -l //输出当前目录内容的长列表，每个目录或文件占一行</span><br><span class="line">pwd //显示当前目录的全路径</span><br></pre></td></tr></table></figure></li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2017/12/18/Old-Linux-basics/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://john.js.org/2017/12/17/Old-Anti-entropy-and-Gossiping/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Dear John">
+      <meta itemprop="description" content="notes of tech">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | Dear John">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2017/12/17/Old-Anti-entropy-and-Gossiping/" class="post-title-link" itemprop="url">Anti-entropy and Gossiping</a>
         </h2>
 
         <div class="post-meta-container">
@@ -244,7 +322,7 @@
 <h4 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h4><p><strong>anti-entropy</strong>是基于gossip的一种流行的传播模型，在模型中，节点P随机选择另一节点Q，然后交换更新信息，交换更新信息的方法有三种：push、pull和push-pull，书上说push-pull最好，因此就使用push-pull的方法。<br><strong>gossiping</strong>也叫rumor spreading(流言传播)，是anti-entropy的一个特殊变体。区别就是P与Q通信时如果发现Q已经被另外的节点更新了，那么P可能不再传播该信息的概率为1&#x2F;k，比如k&#x3D;4时遇到这种情况，下一次仍然传播的概率就变为3&#x2F;4。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2017/12/17/Anti-entropy-and-Gossiping/#more" rel="contents">
+              <a class="btn" href="/2017/12/17/Old-Anti-entropy-and-Gossiping/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -275,7 +353,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://john.js.org/2017/07/01/os-homework/">
+    <link itemprop="mainEntityOfPage" href="https://john.js.org/2017/07/01/Old-os-homework/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -293,7 +371,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2017/07/01/os-homework/" class="post-title-link" itemprop="url">操作系统实验</a>
+          <a href="/2017/07/01/Old-os-homework/" class="post-title-link" itemprop="url">操作系统实验</a>
         </h2>
 
         <div class="post-meta-container">
@@ -323,7 +401,7 @@
 </blockquote>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2017/07/01/os-homework/#more" rel="contents">
+              <a class="btn" href="/2017/07/01/Old-os-homework/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -354,7 +432,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://john.js.org/2017/06/30/Web-server-with-thread-pool/">
+    <link itemprop="mainEntityOfPage" href="https://john.js.org/2017/06/30/Old-Web-server-with-thread-pool/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -372,7 +450,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2017/06/30/Web-server-with-thread-pool/" class="post-title-link" itemprop="url">Web server with thread pool</a>
+          <a href="/2017/06/30/Old-Web-server-with-thread-pool/" class="post-title-link" itemprop="url">Web server with thread pool</a>
         </h2>
 
         <div class="post-meta-container">
@@ -407,7 +485,7 @@
 </blockquote>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2017/06/30/Web-server-with-thread-pool/#more" rel="contents">
+              <a class="btn" href="/2017/06/30/Old-Web-server-with-thread-pool/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>

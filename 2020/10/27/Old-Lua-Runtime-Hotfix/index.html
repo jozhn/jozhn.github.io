@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha256-AbA177XfpSnFEvgpYu1jMygiLabzPCJCRIBtR5jGc0k=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"john.js.org","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.13.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="前言常见的Lua热更新都是在客户端下载所有Lua代码之后重启游戏，以实现重载所有数据和函数的目的。但在实际开发过程中，如果每次都要改完Lua代码重启游戏，正常人都不能接受。 除这种热更方式之外，其实还可以实现运行时热更，或者叫无感知热更。可以做到在玩家运行游戏的时候偷偷更新一部分代码。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Lua运行时热更新的实现">
+<meta property="og:url" content="https://john.js.org/2020/10/27/Old-Lua-Runtime-Hotfix/index.html">
+<meta property="og:site_name" content="Dear John">
+<meta property="og:description" content="前言常见的Lua热更新都是在客户端下载所有Lua代码之后重启游戏，以实现重载所有数据和函数的目的。但在实际开发过程中，如果每次都要改完Lua代码重启游戏，正常人都不能接受。 除这种热更方式之外，其实还可以实现运行时热更，或者叫无感知热更。可以做到在玩家运行游戏的时候偷偷更新一部分代码。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-10-27T20:11:51.000Z">
+<meta property="article:modified_time" content="2022-11-02T08:39:58.031Z">
+<meta property="article:author" content="John">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://john.js.org/2020/10/27/Old-Lua-Runtime-Hotfix/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://john.js.org/2020/10/27/Old-Lua-Runtime-Hotfix/","path":"2020/10/27/Old-Lua-Runtime-Hotfix/","title":"Lua运行时热更新的实现"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Lua运行时热更新的实现 | Dear John</title>
+  
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Dear John</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%83%AD%E6%9B%B4%E6%96%B0%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">热更新原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#require%E6%9C%BA%E5%88%B6"><span class="nav-number">2.1.</span> <span class="nav-text">require机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#upvalue"><span class="nav-number">2.2.</span> <span class="nav-text">upvalue</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%A8%E5%B1%80%E8%AF%AD%E5%8F%A5"><span class="nav-number">2.3.</span> <span class="nav-text">全局语句</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%83%AD%E6%9B%B4%E6%96%B0%E7%9A%84%E7%BA%A6%E5%AE%9A"><span class="nav-number">3.</span> <span class="nav-text">热更新的约定</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF"><span class="nav-number">4.</span> <span class="nav-text">实现思路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%83%AD%E6%9B%B4%E6%A8%A1%E5%9D%97"><span class="nav-number">4.1.</span> <span class="nav-text">热更模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%91%E5%90%AC%E6%A8%A1%E5%9D%97"><span class="nav-number">4.2.</span> <span class="nav-text">监听模块</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John</p>
+  <div class="site-description" itemprop="description">notes of tech</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">44</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jozhn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jozhn" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jozhn@live.com" title="E-Mail → mailto:jozhn@live.com" rel="noopener" target="_blank"><i class="envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://john.js.org/2020/10/27/Old-Lua-Runtime-Hotfix/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Dear John">
+      <meta itemprop="description" content="notes of tech">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Lua运行时热更新的实现 | Dear John">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Lua运行时热更新的实现
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-10-27 20:11:51" itemprop="dateCreated datePublished" datetime="2020-10-27T20:11:51+00:00">2020-10-27</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>常见的Lua热更新都是在客户端下载所有Lua代码之后重启游戏，以实现重载所有数据和函数的目的。但在实际开发过程中，如果每次都要改完Lua代码重启游戏，正常人都不能接受。</p>
+<p>除这种热更方式之外，其实还可以实现运行时热更，或者叫无感知热更。可以做到在玩家运行游戏的时候偷偷更新一部分代码。</p>
+<span id="more"></span>
+
+<p>很多项目会将只负责处理界面的View层Lua代码在每次调用时重新读取，以此实现不重启地更新代码。但这样依然有局限性——如果需要在数据层等其他模块修改函数，这些修改都无法生效。因为如果直接<code>require</code>，旧的数据都会丢失。</p>
+<p>要实现比较合理的运行时热更新，除了设计热更的逻辑之外，前提是遵循一些约定。在规定热更新约定之前，先了解一下Lua热更新涉及的原理。</p>
+<h2 id="热更新原理"><a href="#热更新原理" class="headerlink" title="热更新原理"></a>热更新原理</h2><h3 id="require机制"><a href="#require机制" class="headerlink" title="require机制"></a>require机制</h3><p>从 Lua 5.1 开始，Lua 加入了标准的模块管理机制，可以把一些公用的代码放在一个文件里，以 API 接口的形式在其他地方调用，有利于代码的重用和降低代码耦合度。</p>
+<p>Lua 的模块是由变量、函数等已知元素组成的 table，因此创建一个模块很简单，就是创建一个 table，然后把需要导出的常量、函数放入其中，最后返回这个 table 就行。</p>
+<p>以下为创建自定义模块 <code>exmaple.lua</code>，文件代码格式如下：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">exmaple = &#123;&#125;</span><br><span class="line"></span><br><span class="line">exmaple.constant = <span class="string">&quot;constant variable&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">exmaple.func1</span><span class="params">()</span></span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;public func&quot;</span>)</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">local</span> <span class="function"><span class="keyword">function</span> <span class="title">func2</span><span class="params">()</span></span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;private func&quot;</span>)</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">exmaple.func3</span><span class="params">()</span></span></span><br><span class="line">    func2()</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> exmaple</span><br></pre></td></tr></table></figure>
+
+<p>在其他模块中，需要调用<code>exmaple.lua</code>模块的函数，则需要<code>require</code></p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">require</span>(<span class="string">&quot;exmaple&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>或者</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">require</span> <span class="string">&quot;exmaple&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><code>require</code>之后，Lua的<code>package.loaded</code>中就会有<code>exmaple.lua</code>模块的数据，并且只有第一次<code>require</code>会执行<code>exmaple.lua</code>中的内容，之后再次<code>require</code>就会直接返回<code>package.loaded[&quot;exmaple&quot;]</code>。</p>
+<p>这样的话，如果想要更新<code>exmaple.lua</code>的内容，就需要先清空<code>package.loaded[&quot;exmaple&quot;]</code>再<code>require</code>。</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">package</span>.<span class="built_in">loaded</span>[<span class="string">&quot;example&quot;</span>] = <span class="literal">nil</span></span><br><span class="line"><span class="built_in">require</span>(<span class="string">&quot;example&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>似乎这样就实现了简单的热更，但这远远不够。因为清空<code>package.loaded[&quot;exmaple&quot;]</code>会导致丢失原有的数据，下面是一个简单的例子：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">local</span> t = &#123;&#125;</span><br><span class="line">t.data = <span class="number">0</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">t.func</span><span class="params">()</span></span></span><br><span class="line">    <span class="built_in">print</span>(t.data)</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="keyword">return</span> t</span><br></pre></td></tr></table></figure>
+
+<p>如果按照上面的方式热更，每次<code>t.data</code>都会被重置为0，显然这不是我们想要的。</p>
+<p>这种情况下，<code>t.data</code>作为函数<code>t.func</code>的<code>upvalue</code>（外部局部变量）会被重置。</p>
+<h3 id="upvalue"><a href="#upvalue" class="headerlink" title="upvalue"></a>upvalue</h3><p>上面讲到的就是upvalue的例子，在游戏运行时，我们不会希望数据被覆盖或清空，应该尽量在保留原有数据的情况下替换函数的逻辑。</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">local</span> count = <span class="number">0</span></span><br><span class="line"><span class="keyword">local</span> <span class="function"><span class="keyword">function</span> <span class="title">func</span><span class="params">()</span></span></span><br><span class="line">	count = count + <span class="number">1</span></span><br><span class="line">	<span class="built_in">print</span>(count)</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="keyword">return</span> func</span><br></pre></td></tr></table></figure>
+
+<p>在上面这个例子中，如果使用<code>require</code>机制热更代码，我们需要保存旧函数的<code>count</code>值。Lua中提供了获取并设置upvalue的方法<code>debug.getupvalue</code>和<code>debug.setupvalue</code>。</p>
+<p>遍历一个函数的所有upvalue并设置upvalue：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">local</span> oldfunc = <span class="built_in">require</span> <span class="string">&quot;example&quot;</span></span><br><span class="line"><span class="built_in">package</span>.<span class="built_in">loaded</span>[<span class="string">&quot;example&quot;</span>] = <span class="literal">nil</span></span><br><span class="line"><span class="keyword">local</span> newfunc = <span class="built_in">require</span> <span class="string">&quot;example&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i = <span class="number">1</span>, <span class="built_in">math</span>.<span class="built_in">huge</span> <span class="keyword">do</span></span><br><span class="line">	<span class="keyword">local</span> name, value = <span class="built_in">debug</span>.<span class="built_in">getupvalue</span>(oldfunc, i)</span><br><span class="line">	<span class="keyword">if</span> <span class="keyword">not</span> name <span class="keyword">then</span> <span class="keyword">break</span> <span class="keyword">end</span></span><br><span class="line">	<span class="built_in">debug</span>.<span class="built_in">setupvalue</span>(newfunc, i, value)</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
+<p>要注意的是，函数同样可以作为upvalue，而我们希望使用新的函数、旧的数据。所以在遍历upvalue的时候需要判断是否为函数，如果是则要用新的覆盖。</p>
+<h3 id="全局语句"><a href="#全局语句" class="headerlink" title="全局语句"></a>全局语句</h3><p>在<code>require</code>一个模块时，会重新执行其中的全局语句，这会破坏已有的代码逻辑。解决办法有两种，都比较复杂。一种是语法分析，将全局语句变成<code>local i = &#123;&#125;</code>这种，保留住这个变量，然后把旧的数据复制过来；另一种是使用临时环境表执行新模块，执行完切换成旧模块使用的环境表。</p>
+<p>这两种方法都比较麻烦，一般需要热更的主要都是各个系统的数据层，这些数据层基本不会包含全局语句的修改，所以我们可以忽略这种情况，只进行数据层的热更新。在多数情况下可以满足需求。</p>
+<h2 id="热更新的约定"><a href="#热更新的约定" class="headerlink" title="热更新的约定"></a>热更新的约定</h2><p>了解了上面的原理之后，我们要想实现简单的Lua运行时热更新，需要满足以下的约定。</p>
+<ol>
+<li>不破坏原有数据</li>
+</ol>
+<p>游戏运行时许多Lua系统中都保存了服务器发来的数据，或者是计算产生的一些数据，我们不希望这些数据被清空或改变。热更新的基础就是更新服务的逻辑，通常只是逻辑发生变化，但原有的值并不能被改变。</p>
+<ol start="2">
+<li>不为热更多写代码</li>
+</ol>
+<p>程序员都比较懒，如果热更需要现在原有的逻辑中加入热更前后进行的操作的话，没人能接受。就像为了热更C#而改变原有的代码结构，应该尽量避免额外的负担。</p>
+<ol start="3">
+<li>只修改逻辑，而非增加</li>
+</ol>
+<p>一般来说需要运行时热更的都是改动比较小的更新或者修复一些bug，这种情况下只要修改函数就可以达到目的，而没有必要新增函数。而且，新增的函数如果使用了upvalue，新增之后没法给它赋值，因为在旧的模块中不存在这个upvalue。</p>
+<ol start="4">
+<li>可以热更嵌套结构中的函数</li>
+</ol>
+<p>比如table中的函数、table的metatable中的函数等。</p>
+<ol start="5">
+<li>不改变所有数据和函数的命名</li>
+</ol>
+<p>显然，如果改变命名，那谁知道要更新啥呢~</p>
+<h2 id="实现思路"><a href="#实现思路" class="headerlink" title="实现思路"></a>实现思路</h2><p>下面简单介绍实现思路。</p>
+<h3 id="热更模块"><a href="#热更模块" class="headerlink" title="热更模块"></a>热更模块</h3><p>一般来说需要热更的话，是你修改了某个<code>XXXModel.lua</code>文件，这个文件在<code>package.loaded</code>中名为<code>XXXSystem.XXXModel</code>。其中<code>XXXSystem</code>是这个Lua模块存放的文件夹名称。</p>
+<p>热更之前要先保存旧模块的全部数据：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">local</span> oldModule</span><br><span class="line"><span class="keyword">if</span> <span class="built_in">package</span>.<span class="built_in">loaded</span>[packageName] <span class="keyword">then</span></span><br><span class="line">    oldModule = <span class="built_in">package</span>.<span class="built_in">loaded</span>[packageName]</span><br><span class="line">    <span class="built_in">package</span>.<span class="built_in">loaded</span>[packageName] = <span class="literal">nil</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
+<p>之后直接<code>require</code>新的模块，然后把新模块记录下来，遍历新模块的所有数据。总体来说，遍历的过程中，元素如果是table就保留就模块的，如果是function就用新模块的。</p>
+<p>当然要注意，table会嵌套table和function，因此这是一个递归的过程。</p>
+<p>还有，function要用新的，但是function的的upvalue要用旧的。</p>
+<p>table中的metatable同样作为table处理，使用<code>debug.getmetatable</code>获取一个table的metatable然后进行与table一样的操作。</p>
+<p>对于可能出现循环引用的情况，可以在更新表的时候记录已更新的table，避免重复处理死循环。</p>
+<h3 id="监听模块"><a href="#监听模块" class="headerlink" title="监听模块"></a>监听模块</h3><p>热更可以用在编辑器下，同样可以在线上环境使用（当然要有更严格的限制）。在编辑器下热更的话，要监听本地lua文件的变化，</p>
+<p>Unity编辑器中可以使用<code>FileSystemWatcher</code>来实现监听，可以把这个功能封装到一个<code>DirectoryWatcher</code>类里，方便监听指定的多个文件夹。</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!Directory.Exists(dirPath)) </span><br><span class="line">	<span class="keyword">return</span>;</span><br><span class="line"><span class="keyword">var</span> watcher = <span class="keyword">new</span> FileSystemWatcher();</span><br><span class="line">watcher.IncludeSubdirectories = <span class="literal">true</span>;</span><br><span class="line">watcher.Path = dirPath;</span><br><span class="line">watcher.NotifyFilter = NotifyFilters.LastWrite;</span><br><span class="line">watcher.Filter = <span class="string">&quot;*.lua&quot;</span>;</span><br><span class="line">watcher.Changed += handler;</span><br><span class="line">watcher.EnableRaisingEvents = <span class="literal">true</span>;</span><br><span class="line">watcher.InternalBufferSize = <span class="number">10240</span>;</span><br></pre></td></tr></table></figure>
+
+<p>编辑器下游戏启动时创建<code>DirectoryWatcher</code>监听指定文件夹，并写处理函数<code>LuaFileOnChanged</code></p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> luaDirWatcher = <span class="keyword">new</span> DirectoryWatcher(LuaConst.luaDir, <span class="keyword">new</span> FileSystemEventHandler(LuaFileOnChanged));<span class="comment">//监听lua文件</span></span><br></pre></td></tr></table></figure>
+
+<p>触发<code>LuaFileOnChanged</code>的时候调用对应的Lua方法重载该文件模块即可。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>以上是Lua热更的简单实现，应用于生产环境的话还不是很完善，需要考虑更多的情况，这里就不赘述了。但用在开发时，这个功能还是很有用的。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/08/31/Old-Effective-Csharp-Idioms/" rel="prev" title="Effective C# 之 C#的编程习惯">
+                  <i class="fa fa-chevron-left"></i> Effective C# 之 C#的编程习惯
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/11/02/Old-ToLua-Compile-With-lua-protobuf/" rel="next" title="tolua编译集成lua-protobuf指南">
+                  tolua编译集成lua-protobuf指南 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"jozhn/blog-utterances","issue_term":"pathname","theme":"github-light"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

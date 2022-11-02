@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha256-AbA177XfpSnFEvgpYu1jMygiLabzPCJCRIBtR5jGc0k=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"john.js.org","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.13.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="NGUI中的屏幕尺寸是设计者决定的，那么在不同的手机或者电脑下是怎么适配的呢？研究了半天，下面记录一下研究的结果。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NGUI屏幕适配原理与计算">
+<meta property="og:url" content="https://john.js.org/2019/11/17/Old-NGUI-screen-resolution-compute/index.html">
+<meta property="og:site_name" content="Dear John">
+<meta property="og:description" content="NGUI中的屏幕尺寸是设计者决定的，那么在不同的手机或者电脑下是怎么适配的呢？研究了半天，下面记录一下研究的结果。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-11-17T20:07:40.000Z">
+<meta property="article:modified_time" content="2022-11-02T08:39:58.031Z">
+<meta property="article:author" content="John">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://john.js.org/2019/11/17/Old-NGUI-screen-resolution-compute/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://john.js.org/2019/11/17/Old-NGUI-screen-resolution-compute/","path":"2019/11/17/Old-NGUI-screen-resolution-compute/","title":"NGUI屏幕适配原理与计算"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>NGUI屏幕适配原理与计算 | Dear John</title>
+  
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Dear John</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E5%B0%BA%E5%AF%B8"><span class="nav-number">1.</span> <span class="nav-text">设计尺寸</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%BD%E9%AB%98%E6%AF%94"><span class="nav-number">2.</span> <span class="nav-text">宽高比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%82%E9%85%8D%E5%8E%9F%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">适配原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E6%AD%A5%E9%AA%A4"><span class="nav-number">4.</span> <span class="nav-text">计算步骤</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John</p>
+  <div class="site-description" itemprop="description">notes of tech</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">44</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jozhn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jozhn" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jozhn@live.com" title="E-Mail → mailto:jozhn@live.com" rel="noopener" target="_blank"><i class="envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://john.js.org/2019/11/17/Old-NGUI-screen-resolution-compute/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Dear John">
+      <meta itemprop="description" content="notes of tech">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="NGUI屏幕适配原理与计算 | Dear John">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          NGUI屏幕适配原理与计算
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-11-17 20:07:40" itemprop="dateCreated datePublished" datetime="2019-11-17T20:07:40+00:00">2019-11-17</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>NGUI中的屏幕尺寸是设计者决定的，那么在不同的手机或者电脑下是怎么适配的呢？研究了半天，下面记录一下研究的结果。</p>
+<span id="more"></span>
+
+<h2 id="设计尺寸"><a href="#设计尺寸" class="headerlink" title="设计尺寸"></a>设计尺寸</h2><p>设计尺寸是NGUI中UI Root上设置的宽和高，一般会设置Scaling Style为Constrained On Mobiles，这样在手机上运行的时候会根据手机实际的尺寸以及宽高比进行适配。下面的Content Width和Height就是设计尺寸的宽和高，本文以1366 * 768为例。</p>
+<h2 id="宽高比"><a href="#宽高比" class="headerlink" title="宽高比"></a>宽高比</h2><p>宽高比就是宽比高,1366&#x2F;768也就是<strong>1.7786</strong>，而手机的分辨率各种各样，宽高比各不相同，在适配之前都需要计算一下宽高比，以此来确定适配方式。</p>
+<h2 id="适配原理"><a href="#适配原理" class="headerlink" title="适配原理"></a>适配原理</h2><p>设计的尺寸是1366 * 768，接近16:9的宽高比，那么假如说手机是1920 * 1080的分辨率，该怎么显示游戏画面呢？</p>
+<p>很显然1366 * 768是比1920 * 1080小的，总不可能把1366 * 768的游戏画面按照实际分辨率显示在手机上，那也太丑了。</p>
+<p>我们先计算1920 * 1080的宽高比，算出来是1.7778，正好等于16:9，比1366 * 768的宽高比略小，也就是<strong>相对来说</strong>，1920 * 1080的宽没有1366 * 768的宽那么长。</p>
+<p>这种情况下我们可以同比把设计尺寸（1366 * 768）放大，放大到高度为1080，这时设计尺寸就变成了1920.938 * 1080，恰好比手机的1920 * 1080多了不到一像素，这时就可以认为是适配结束了。</p>
+<p>再换个例子，假设手机分辨率为2340 * 1080，宽高比为2.1667，明显大于1.7786，这时要把设计尺寸的1366 * 768同比放大到宽度为2340，结果就是设计尺寸变成了2340 * 1315.6，这样放大之后会牺牲上下一百多像素的内容，不过游戏中边界的元素都是使用锚点控制位置的，所以不用担心看不到按钮之类的。</p>
+<h2 id="计算步骤"><a href="#计算步骤" class="headerlink" title="计算步骤"></a>计算步骤</h2><p>总结一下适配计算的步骤</p>
+<ol>
+<li>计算宽高比ratio</li>
+<li>将ratio与设计尺寸的宽高比进行比较<ol>
+<li>大于则按照宽适配（即缩放设计尺寸直到宽与手机分辨率的宽相同）</li>
+<li>小于则按照高适配（即缩放设计尺寸直到高与手机分辨率的高相同）</li>
+</ol>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/11/03/Old-Unity-NGUI-position/" rel="prev" title="Unity NGUI元素位置计算与截图">
+                  <i class="fa fa-chevron-left"></i> Unity NGUI元素位置计算与截图
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/11/29/Old-output-Unity-log-to-web-with-Websocket/" rel="next" title="Websocket将Unity日志输出到网页">
+                  Websocket将Unity日志输出到网页 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"jozhn/blog-utterances","issue_term":"pathname","theme":"github-light"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

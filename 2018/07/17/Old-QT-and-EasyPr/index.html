@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha256-AbA177XfpSnFEvgpYu1jMygiLabzPCJCRIBtR5jGc0k=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"john.js.org","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.13.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="前提条件 QT5.3.0 with MinGW opencv3.0+  opencv配置MinGW 编译好的 opencv 3.2.0   解压opencv文件夹到C盘根目录 添加系统环境变量如下两项到Path： C:\opencv\build\install\x86\mingw\bin C:\opencv\build\install\x86\mingw\lib   检查QT5.3.0自带的Min">
+<meta property="og:type" content="article">
+<meta property="og:title" content="QT使用EasyPR识别车牌的正确方式">
+<meta property="og:url" content="https://john.js.org/2018/07/17/Old-QT-and-EasyPr/index.html">
+<meta property="og:site_name" content="Dear John">
+<meta property="og:description" content="前提条件 QT5.3.0 with MinGW opencv3.0+  opencv配置MinGW 编译好的 opencv 3.2.0   解压opencv文件夹到C盘根目录 添加系统环境变量如下两项到Path： C:\opencv\build\install\x86\mingw\bin C:\opencv\build\install\x86\mingw\lib   检查QT5.3.0自带的Min">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H1b7ed3e77b014538ba4f6231f7cca449G.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H622998a9f72d400993279cc8a1b4bdb1N.png">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/H9d4fcde8faea4247862f67de47dcdbd3l.png">
+<meta property="article:published_time" content="2018-07-17T21:15:50.000Z">
+<meta property="article:modified_time" content="2022-11-02T08:39:58.031Z">
+<meta property="article:author" content="John">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ae01.alicdn.com/kf/H1b7ed3e77b014538ba4f6231f7cca449G.png">
+
+
+<link rel="canonical" href="https://john.js.org/2018/07/17/Old-QT-and-EasyPr/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://john.js.org/2018/07/17/Old-QT-and-EasyPr/","path":"2018/07/17/Old-QT-and-EasyPr/","title":"QT使用EasyPR识别车牌的正确方式"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>QT使用EasyPR识别车牌的正确方式 | Dear John</title>
+  
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Dear John</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E6%8F%90%E6%9D%A1%E4%BB%B6"><span class="nav-number">1.</span> <span class="nav-text">前提条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#opencv%E9%85%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">opencv配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EasyPR%E9%85%8D%E7%BD%AE"><span class="nav-number">3.</span> <span class="nav-text">EasyPR配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E4%BB%A3%E7%A0%81"><span class="nav-number">4.</span> <span class="nav-text">运行代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E9%94%99%E8%AF%AF"><span class="nav-number">5.</span> <span class="nav-text">常见错误</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%89%BE%E4%B8%8D%E5%88%B0opencv%E5%A4%B4%E6%96%87%E4%BB%B6"><span class="nav-number">5.0.1.</span> <span class="nav-text">找不到opencv头文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%89%BE%E4%B8%8D%E5%88%B0easypr%E5%A4%B4%E6%96%87%E4%BB%B6"><span class="nav-number">5.0.2.</span> <span class="nav-text">找不到easypr头文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A8%8B%E5%BA%8Fruntime-error%E6%88%96crashed"><span class="nav-number">5.0.3.</span> <span class="nav-text">程序runtime error或crashed</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John</p>
+  <div class="site-description" itemprop="description">notes of tech</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">44</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jozhn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jozhn" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jozhn@live.com" title="E-Mail → mailto:jozhn@live.com" rel="noopener" target="_blank"><i class="envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://john.js.org/2018/07/17/Old-QT-and-EasyPr/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Dear John">
+      <meta itemprop="description" content="notes of tech">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="QT使用EasyPR识别车牌的正确方式 | Dear John">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          QT使用EasyPR识别车牌的正确方式
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-07-17 21:15:50" itemprop="dateCreated datePublished" datetime="2018-07-17T21:15:50+00:00">2018-07-17</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="前提条件"><a href="#前提条件" class="headerlink" title="前提条件"></a>前提条件</h2><ul>
+<li>QT5.3.0 with MinGW</li>
+<li>opencv3.0+</li>
+</ul>
+<h2 id="opencv配置"><a href="#opencv配置" class="headerlink" title="opencv配置"></a>opencv配置</h2><p>MinGW 编译好的 opencv 3.2.0 </p>
+<ul>
+<li>解压opencv文件夹到C盘根目录</li>
+<li>添加<strong>系统环境变量</strong>如下两项到<strong>Path</strong>：<ul>
+<li>C:\opencv\build\install\x86\mingw\bin</li>
+<li>C:\opencv\build\install\x86\mingw\lib</li>
+</ul>
+</li>
+<li>检查<strong>QT5.3.0</strong>自带的<strong>MinGW</strong>是否在<strong>环境变量</strong>中(没有则添加)：<ul>
+<li>C:\Qt\Qt5.3.0\5.3\mingw482_32\bin</li>
+<li>C:\Qt\Qt5.3.0\Tools\mingw482_32\bin</li>
+<li>C:\Qt\Qt5.3.0\Tools\mingw482_32\i686-w64-mingw32\bin</li>
+</ul>
+</li>
+<li>配置好重启QT！！！</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="EasyPR配置"><a href="#EasyPR配置" class="headerlink" title="EasyPR配置"></a>EasyPR配置</h2><ul>
+<li><p>创建一个新的QT界面项目，命名不要是easypr，路径不要有中文</p>
+</li>
+<li><p>easypr精简版 (因为easypr里面有很多东西没用到，所以精简一下只需要2mb不到)</p>
+</li>
+<li><p>解压压缩包中所有文件到项目根目录</p>
+</li>
+<li><p>如下所示添加easypr文件到项目</p>
+</li>
+</ul>
+<p><img src="https://ae01.alicdn.com/kf/H1b7ed3e77b014538ba4f6231f7cca449G.png" alt="H1b7ed3e77b014538ba4f6231f7cca449G"></p>
+<p><img src="https://ae01.alicdn.com/kf/H622998a9f72d400993279cc8a1b4bdb1N.png" alt="H622998a9f72d400993279cc8a1b4bdb1N"></p>
+<ul>
+<li><p>.pro文件配置<br>.pro中最上面加上以下内容，因为easypr需要c++11标准编译</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">QMAKE_CXXFLAGS+=-std=c++11</span><br><span class="line">CONFIG += c++11</span><br></pre></td></tr></table></figure>
+<p>.pro文件最下面添加以下内容</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">INCLUDEPATH+=E:\QT\PlateR\include</span><br><span class="line"></span><br><span class="line">win32&#123;</span><br><span class="line">INCLUDEPATH+=C:\opencv\build\install\include</span><br><span class="line">LIBS += C:\opencv\build\install\x86\mingw\bin\libopencv_*.dll</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注：<code>INCLUDEPATH+=E:\QT\PlateR\include</code>这条按照你的项目路径来</p>
+</li>
+<li><p>配置config.h</p>
+</li>
+</ul>
+<p>在项目里找到include&#x2F;easypr&#x2F;下的config.h，打开来看到以下内容，在30行左右</p>
+<p><img src="https://ae01.alicdn.com/kf/H9d4fcde8faea4247862f67de47dcdbd3l.png" alt="H9d4fcde8faea4247862f67de47dcdbd3l"></p>
+<p>按照我的格式把路径改成你项目的路径，格式千万不能错</p>
+<h2 id="运行代码"><a href="#运行代码" class="headerlink" title="运行代码"></a>运行代码</h2><p>main.cpp示例</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;dialog.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QApplication&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;opencv2/core.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;opencv2/highgui/highgui.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;opencv2/imgproc.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;include/easypr.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;include/easypr/util/switch.hpp&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;include/easypr/core/plate.hpp&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;QDebug&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> easypr;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> cv;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">QApplication <span class="title">a</span><span class="params">(argc, argv)</span></span>;</span><br><span class="line">    Dialog w;</span><br><span class="line">    w.<span class="built_in">show</span>();</span><br><span class="line"></span><br><span class="line">    CPlateRecognize pr;</span><br><span class="line">    pr.<span class="built_in">setDetectType</span>(PR_DETECT_CMSER|PR_DETECT_COLOR);</span><br><span class="line">    vector&lt;CPlate&gt;plateVec;</span><br><span class="line">    cv::Mat image;</span><br><span class="line">    image = cv::<span class="built_in">imread</span>(<span class="string">&quot;E://test.jpg&quot;</span>);</span><br><span class="line">    pr.<span class="built_in">setResultShow</span>(<span class="literal">false</span>);</span><br><span class="line">    <span class="type">int</span> result = pr.<span class="built_in">plateRecognize</span>(image,plateVec);</span><br><span class="line">	pr.<span class="built_in">getDetectShow</span>();</span><br><span class="line">	CPlate plate = plateVec.<span class="built_in">at</span>(<span class="number">0</span>);</span><br><span class="line">	string license = plate.<span class="built_in">getPlateStr</span>();</span><br><span class="line">	QString lice1 = QString::<span class="built_in">fromLocal8Bit</span>(license.<span class="built_in">c_str</span>());</span><br><span class="line">	<span class="built_in">qDebug</span>()&lt;&lt;lice1;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span>(image.<span class="built_in">empty</span>())</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	cv::<span class="built_in">namedWindow</span>(<span class="string">&quot;image show&quot;</span>);</span><br><span class="line">	cv::<span class="built_in">imshow</span>(<span class="string">&quot;image show&quot;</span>,image);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> a.<span class="built_in">exec</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样就可以运行了，正常的话控制台会输出车牌号码</p>
+<h2 id="常见错误"><a href="#常见错误" class="headerlink" title="常见错误"></a>常见错误</h2><h4 id="找不到opencv头文件"><a href="#找不到opencv头文件" class="headerlink" title="找不到opencv头文件"></a>找不到opencv头文件</h4><p>没有配置opencv环境变量</p>
+<h4 id="找不到easypr头文件"><a href="#找不到easypr头文件" class="headerlink" title="找不到easypr头文件"></a>找不到easypr头文件</h4><p>.pro文件中的<code>INCLUDEPATH+=E:\QT\PlateR\include</code>这句路径错了，需要是你的项目路径下的include文件夹！</p>
+<h4 id="程序runtime-error或crashed"><a href="#程序runtime-error或crashed" class="headerlink" title="程序runtime error或crashed"></a>程序runtime error或crashed</h4><p>config.h文件中的model路径错了</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/06/20/Old-QT-with-MinGW-built-OpenCV/" rel="prev" title="QT下运行用MinGW编译的OpenCV简明教程">
+                  <i class="fa fa-chevron-left"></i> QT下运行用MinGW编译的OpenCV简明教程
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/11/09/Old-KMP-algorithm/" rel="next" title="KMP模式匹配">
+                  KMP模式匹配 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"jozhn/blog-utterances","issue_term":"pathname","theme":"github-light"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

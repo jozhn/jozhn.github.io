@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha256-AbA177XfpSnFEvgpYu1jMygiLabzPCJCRIBtR5jGc0k=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"john.js.org","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.13.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Lua 中的 os.time() 获取的时间是当前设备的时间，但是当前设备是可以修改时间的，所以这个接口并不可靠。另外如果设备修改了时区，这个接口也没有提供获取指定时区当前时间的功能。 这样在各种需要显示时间以及根据时间判断是否开放系统的地方很可能因此出现问题。所以需要自己封装一些接口来获取服务器时区对应的时间。因为游戏时间肯定是以服务器所在时区显示为准。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Lua中的时区问题">
+<meta property="og:url" content="https://john.js.org/2021/02/09/Old-Timezone-problem-in-lua/index.html">
+<meta property="og:site_name" content="Dear John">
+<meta property="og:description" content="Lua 中的 os.time() 获取的时间是当前设备的时间，但是当前设备是可以修改时间的，所以这个接口并不可靠。另外如果设备修改了时区，这个接口也没有提供获取指定时区当前时间的功能。 这样在各种需要显示时间以及根据时间判断是否开放系统的地方很可能因此出现问题。所以需要自己封装一些接口来获取服务器时区对应的时间。因为游戏时间肯定是以服务器所在时区显示为准。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-02-09T15:42:00.000Z">
+<meta property="article:modified_time" content="2022-11-02T08:39:58.031Z">
+<meta property="article:author" content="John">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://john.js.org/2021/02/09/Old-Timezone-problem-in-lua/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://john.js.org/2021/02/09/Old-Timezone-problem-in-lua/","path":"2021/02/09/Old-Timezone-problem-in-lua/","title":"Lua中的时区问题"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Lua中的时区问题 | Dear John</title>
+  
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Dear John</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%97%B6%E5%8C%BA"><span class="nav-number">1.</span> <span class="nav-text">获取客户端时区</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E6%88%B3%E4%B8%8E%E6%97%A5%E6%9C%9F%E8%BD%AC%E6%8D%A2"><span class="nav-number">2.</span> <span class="nav-text">时间戳与日期转换</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John</p>
+  <div class="site-description" itemprop="description">notes of tech</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">44</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jozhn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jozhn" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jozhn@live.com" title="E-Mail → mailto:jozhn@live.com" rel="noopener" target="_blank"><i class="envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://john.js.org/2021/02/09/Old-Timezone-problem-in-lua/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Dear John">
+      <meta itemprop="description" content="notes of tech">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Lua中的时区问题 | Dear John">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Lua中的时区问题
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-02-09 15:42:00" itemprop="dateCreated datePublished" datetime="2021-02-09T15:42:00+00:00">2021-02-09</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>Lua 中的 <code>os.time()</code> 获取的时间是当前设备的时间，但是当前设备是可以修改时间的，所以这个接口并不可靠。另外如果设备修改了时区，这个接口也没有提供获取指定时区当前时间的功能。</p>
+<p>这样在各种需要显示时间以及根据时间判断是否开放系统的地方很可能因此出现问题。所以需要自己封装一些接口来获取服务器时区对应的时间。因为游戏时间肯定是以服务器所在时区显示为准。</p>
+<span id="more"></span>
+
+<h2 id="获取客户端时区"><a href="#获取客户端时区" class="headerlink" title="获取客户端时区"></a>获取客户端时区</h2><figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 获取客户端时区</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">CommonTools.GetClientTimeZone</span><span class="params">()</span></span></span><br><span class="line">   <span class="keyword">local</span> now = <span class="built_in">os</span>.<span class="built_in">time</span>()</span><br><span class="line">   <span class="keyword">local</span> <span class="built_in">difftime</span> = <span class="built_in">os</span>.<span class="built_in">difftime</span>(now, <span class="built_in">os</span>.<span class="built_in">time</span>(<span class="built_in">os</span>.<span class="built_in">date</span>(<span class="string">&quot;!*t&quot;</span>, now)))</span><br><span class="line">   <span class="keyword">return</span> <span class="built_in">difftime</span> / <span class="number">3600</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
+<p>即使客户端的时间是不准确的，我们也可以算出客户端当前设置的时区是什么，也就是 UTC +几。</p>
+<p>计算方式很简单。是用 从设备获取的<strong>UTC+0</strong>的时间 和 从设备获取的<strong>当前</strong>的时间 做差。</p>
+<p>而服务器时区可以写个固定的，比如 8 就代表北京时间。</p>
+<h2 id="时间戳与日期转换"><a href="#时间戳与日期转换" class="headerlink" title="时间戳与日期转换"></a>时间戳与日期转换</h2><p>服务器传来一个时间戳之后，客户端如果要显示，Lua中需要用 <code>os.date</code> 进行转换，然而 <code>os.date</code> 转换出来的是按照客户端时区转的，并且没有提供参数指定时区，这就难受了。那就自己实现一个 <code>os.date</code> 吧。</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 服务器或者配置表的时间戳转换为服务器对应时区的时间</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">CommonTools.OSDate</span><span class="params">(format, serverTime)</span></span></span><br><span class="line">   <span class="keyword">local</span> clientTimeZone = CommonTools.GetClientTimeZone()</span><br><span class="line">   <span class="keyword">local</span> serverTimeZone = CommonTools.GetServerTimeZone()</span><br><span class="line">   <span class="keyword">local</span> clientTime = <span class="built_in">os</span>.<span class="built_in">date</span>(<span class="string">&quot;!*t&quot;</span>, serverTime)</span><br><span class="line">   <span class="keyword">local</span> offset = (serverTimeZone - clientTimeZone) * <span class="number">3600</span> + (clientTime.isdst <span class="keyword">and</span> <span class="number">1</span> <span class="keyword">or</span> <span class="number">0</span>) * <span class="number">3600</span> <span class="comment">-- 时差包括时区差距以及夏令时</span></span><br><span class="line">   <span class="keyword">local</span> tempTime = serverTime + offset</span><br><span class="line">   <span class="keyword">if</span> <span class="built_in">string</span>.IsNullOrEmpty(<span class="built_in">format</span>) <span class="keyword">then</span></span><br><span class="line">      <span class="built_in">format</span> = <span class="string">&quot;*t&quot;</span></span><br><span class="line">   <span class="keyword">end</span></span><br><span class="line">   <span class="keyword">return</span> <span class="built_in">os</span>.<span class="built_in">date</span>(<span class="built_in">format</span>, tempTime)</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
+<p>既然 <code>os.date</code> 是按照客户端时区转换，那么比如服务器是UTC+8，客户端是UTC+9，那么服务器的时间戳在客户端转换之后产生的日期就会多一个小时——比如实际是UTC+8 2021年1月1日5点的时间戳，放到客户端转换就会把它当作UTC+9的时间戳去做转换，转换出来就变成了UTC+9 2021年1月1日2点，快了一个小时。</p>
+<p>所以，要让最终算出正确的结果，需要先用服务器时区减去客户端时区计算出偏移，如果客户端时区更大，偏移就是负的，反之就是正的。这样算出来的日期才是正确的。</p>
+<p>同理，<code>os.time</code> 也需要做类似的转换，不过偏移要反过来：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 客户端的时间table转换为服务器的时间戳 仅限转换客户端本地时间</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">CommonTools.OSTime</span><span class="params">(table)</span></span></span><br><span class="line">   <span class="keyword">local</span> clientTimeZone = CommonTools.GetClientTimeZone()</span><br><span class="line">   <span class="keyword">local</span> serverTimeZone = CommonTools.GetServerTimeZone()</span><br><span class="line">   <span class="keyword">local</span> offset = clientTimeZone - serverTimeZone</span><br><span class="line">   <span class="built_in">table</span>.hour = <span class="built_in">table</span>.hour + offset</span><br><span class="line">   <span class="keyword">return</span> <span class="built_in">os</span>.<span class="built_in">time</span>(<span class="built_in">table</span>)</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/01/05/Old-LuaJIT-Compile/" rel="prev" title="LuaJIT在各平台的编译方法">
+                  <i class="fa fa-chevron-left"></i> LuaJIT在各平台的编译方法
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/03/14/Old-protobuf-and-json/" rel="next" title="序列化和反序列化">
+                  序列化和反序列化 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"jozhn/blog-utterances","issue_term":"pathname","theme":"github-light"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

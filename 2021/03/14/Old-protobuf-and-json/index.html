@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha256-AbA177XfpSnFEvgpYu1jMygiLabzPCJCRIBtR5jGc0k=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"john.js.org","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.13.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="互联网的产生带来了机器间通讯的需求，而互联通讯的双方需要采用约定的协议，序列化和反序列化属于通讯协议的一部分。  序列化： 将数据结构或对象转换成二进制串的过程 反序列化：将在序列化过程中所生成的二进制串转换成数据结构或者对象的过程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="序列化和反序列化">
+<meta property="og:url" content="https://john.js.org/2021/03/14/Old-protobuf-and-json/index.html">
+<meta property="og:site_name" content="Dear John">
+<meta property="og:description" content="互联网的产生带来了机器间通讯的需求，而互联通讯的双方需要采用约定的协议，序列化和反序列化属于通讯协议的一部分。  序列化： 将数据结构或对象转换成二进制串的过程 反序列化：将在序列化过程中所生成的二进制串转换成数据结构或者对象的过程">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-03-14T18:32:41.000Z">
+<meta property="article:modified_time" content="2022-11-02T08:39:58.031Z">
+<meta property="article:author" content="John">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://john.js.org/2021/03/14/Old-protobuf-and-json/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://john.js.org/2021/03/14/Old-protobuf-and-json/","path":"2021/03/14/Old-protobuf-and-json/","title":"序列化和反序列化"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>序列化和反序列化 | Dear John</title>
+  
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Dear John</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#JSON"><span class="nav-number">1.</span> <span class="nav-text">JSON</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B8%E5%9E%8B%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E5%92%8C%E9%9D%9E%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">1.1.</span> <span class="nav-text">典型应用场景和非应用场景</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Protobuf"><span class="nav-number">2.</span> <span class="nav-text">Protobuf</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B8%E5%9E%8B%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E5%92%8C%E9%9D%9E%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF-1"><span class="nav-number">2.1.</span> <span class="nav-text">典型应用场景和非应用场景</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E6%AF%94"><span class="nav-number">3.</span> <span class="nav-text">对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Protobuf%E7%9A%84%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96"><span class="nav-number">4.</span> <span class="nav-text">Protobuf的反序列化</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John</p>
+  <div class="site-description" itemprop="description">notes of tech</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">44</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jozhn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jozhn" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jozhn@live.com" title="E-Mail → mailto:jozhn@live.com" rel="noopener" target="_blank"><i class="envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://john.js.org/2021/03/14/Old-protobuf-and-json/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Dear John">
+      <meta itemprop="description" content="notes of tech">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="序列化和反序列化 | Dear John">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          序列化和反序列化
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-03-14 18:32:41" itemprop="dateCreated datePublished" datetime="2021-03-14T18:32:41+00:00">2021-03-14</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>互联网的产生带来了机器间通讯的需求，而互联通讯的双方需要采用约定的协议，序列化和反序列化属于通讯协议的一部分。</p>
+<ul>
+<li>序列化： 将数据结构或对象转换成二进制串的过程</li>
+<li>反序列化：将在序列化过程中所生成的二进制串转换成数据结构或者对象的过程</li>
+</ul>
+<span id="more"></span>
+
+<p>数据结构和对象：对于面向对象的语言，工程师所操作的一切都是对象（Object），来自于类的实例化。</p>
+<p>二进制串：序列化所生成的二进制串指的是存储在内存中的一块数据。一般指byte[]，而C++中的byte不是内置类型，使用unsigned char来代替。</p>
+<p>序列化和反序列化的协议需要考虑的特性：</p>
+<ul>
+<li>通用性<ul>
+<li>跨平台、跨语言</li>
+<li>流行程度</li>
+</ul>
+</li>
+<li>强健性&#x2F;鲁棒性<ul>
+<li>成熟度</li>
+</ul>
+</li>
+<li>可调试性&#x2F;可读性<ul>
+<li>序列化后的数据是否可读</li>
+</ul>
+</li>
+<li>性能</li>
+<li>扩展性&#x2F;兼容性</li>
+<li>安全性</li>
+</ul>
+<h2 id="JSON"><a href="#JSON" class="headerlink" title="JSON"></a>JSON</h2><p>JSON起源于弱类型语言Javascript， 它的产生来自于一种称之为”Associative array”的概念，其本质是就是采用“Attribute－value”的方式来描述对象。实际上在Javascript和PHP等弱类型语言中，类的描述方式就是Associative array。JSON的如下优点，使得它快速成为最广泛使用的序列化协议之一：</p>
+<ol>
+<li><p>这种Associative array格式非常符合工程师对对象的理解。</p>
+</li>
+<li><p>它保持了XML的人眼可读（Human-readable）的优点。</p>
+</li>
+<li><p>相对于XML而言，序列化后的数据更加简洁。 来自于的以下链接的研究表明：XML所产生序列化之后文件的大小接近JSON的两倍。<a target="_blank" rel="noopener" href="http://www.codeproject.com/Articles/604720/JSON-vs-XML-Some-hard-numbers-about-verbosity">http://www.codeproject.com/Articles/604720/JSON-vs-XML-Some-hard-numbers-about-verbosity</a> 。</p>
+</li>
+<li><p>它具备Javascript的先天性支持，所以被广泛应用于Web browser的应用常景中，是Ajax的事实标准协议。</p>
+</li>
+<li><p>与XML相比，其协议比较简单，解析速度比较快。</p>
+</li>
+<li><p>松散的Associative array使得其具有良好的可扩展性和兼容性。</p>
+</li>
+</ol>
+<h3 id="典型应用场景和非应用场景"><a href="#典型应用场景和非应用场景" class="headerlink" title="典型应用场景和非应用场景"></a>典型应用场景和非应用场景</h3><p>JSON在很多应用场景中可以替代XML，更简洁并且解析速度更快。典型应用场景包括：</p>
+<p>1、公司之间传输数据量相对小，实时性要求相对低（例如秒级别）的服务。</p>
+<p>2、基于Web browser的Ajax请求。</p>
+<p>3、由于JSON具有非常强的前后兼容性，对于接口经常发生变化，并对可调式性要求高的场景，例如Mobile app与服务端的通讯。</p>
+<p>4、由于JSON的典型应用场景是JSON＋HTTP，适合跨防火墙访问。</p>
+<p>总的来说，采用JSON进行序列化的额外空间开销比较大，对于大数据量服务或持久化，这意味着巨大的内存和磁盘开销，这种场景不适合。没有统一可用的IDL降低了对参与方的约束，实际操作中往往只能采用文档方式来进行约定，这可能会给调试带来一些不便，延长开发周期。 由于JSON在一些语言中的序列化和反序列化需要采用反射机制，所以在性能要求为ms级别，不建议使用。</p>
+<h2 id="Protobuf"><a href="#Protobuf" class="headerlink" title="Protobuf"></a>Protobuf</h2><p>Protobuf具备了优秀的序列化协议的所需的众多典型特征：</p>
+<p>1、标准的IDL和IDL编译器，这使得其对工程师非常友好。</p>
+<p>2、序列化数据非常简洁，紧凑，与XML相比，其序列化之后的数据量约为1&#x2F;3到1&#x2F;10。</p>
+<p>3、解析速度非常快，比对应的XML快约20-100倍。</p>
+<p>4、提供了非常友好的动态库，使用非常简介，反序列化只需要一行代码。</p>
+<p>Protobuf是一个纯粹的展示层协议，可以和各种传输层协议一起使用；Protobuf的文档也非常完善。 但是由于Protobuf产生于Google，所以目前其仅仅支持Java、C++、Python三种语言。另外Protobuf支持的数据类型相对较少，不支持常量类型。</p>
+<h3 id="典型应用场景和非应用场景-1"><a href="#典型应用场景和非应用场景-1" class="headerlink" title="典型应用场景和非应用场景"></a>典型应用场景和非应用场景</h3><p>Protobuf具有广泛的用户基础，空间开销小以及高解析性能是其亮点，非常适合于公司内部的对性能要求高的RPC调用。由于Protobuf提供了标准的IDL以及对应的编译器，其IDL文件是参与各方的非常强的业务约束，另外，Protobuf与传输层无关，采用HTTP具有良好的跨防火墙的访问属性，所以Protobuf也适用于公司间对性能要求比较高的场景。由于其解析性能高，序列化后数据量相对少，非常适合应用层对象的持久化场景。</p>
+<p>它的主要问题在于其所支持的语言相对较少，另外由于没有绑定的标准底层传输层协议，在公司间进行传输层协议的调试工作相对麻烦。</p>
+<h2 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h2><p>Protobuf 和json对比：</p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/53339153">https://zhuanlan.zhihu.com/p/53339153</a></p>
+<p>在JavaScript环境下，Protobuf 只比 JSON 快一点，尤其是在 JSON 开启压缩的情况下，而且 JSON 具有可读性，也更容易调试，所以一般都会选择 JSON。</p>
+<p>但如果我们使用的是其他平台，在非压缩环境中使用 Protobuf 时，请求所花费的时间比 JSON 请求少78％。 这表明二进制格式的执行速度几乎是文本格式的5倍。</p>
+<p>当 JSON 不是native环境（如NodeJS,浏览器）时，性能提升的非常大。 因此，当您遇到 JSON 的延迟问题时，请考虑迁移到 Protobuf。</p>
+<p>当然Protobuf也有一些缺点，比如开发者远远少于Json。官方支持的语言较少，比如不支持Lua，只能使用第三方库。</p>
+<h2 id="Protobuf的反序列化"><a href="#Protobuf的反序列化" class="headerlink" title="Protobuf的反序列化"></a>Protobuf的反序列化</h2><p>Protobuf 反序列化</p>
+<p>Protobuf 的二进制流格式符合 TLV 标准，（tag length value），key 就是 tag，包含了字段序号和类型，计算方式如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">key =  (field_number &lt;&lt; 3) | wire_type</span><br></pre></td></tr></table></figure>
+
+<p>每种数据类型都有对应的 Type：</p>
+<table>
+<thead>
+<tr>
+<th align="left">Type</th>
+<th align="left">Meaning</th>
+<th align="left">Used For</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">0</td>
+<td align="left">Varint</td>
+<td align="left">int32, int64, uint32, uint64, sint32, sint64, bool, enum</td>
+</tr>
+<tr>
+<td align="left">1</td>
+<td align="left">64-bit</td>
+<td align="left">fixed64, sfixed64, double</td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td align="left">Length-delimited</td>
+<td align="left">string, bytes, embedded messages, packed repeated fields</td>
+</tr>
+<tr>
+<td align="left">3</td>
+<td align="left">Start group</td>
+<td align="left">groups (deprecated)</td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td align="left">End group</td>
+<td align="left">groups (deprecated)</td>
+</tr>
+<tr>
+<td align="left">5</td>
+<td align="left">32-bit</td>
+<td align="left">fixed32, sfixed32, float</td>
+</tr>
+</tbody></table>
+<p>所以 tag 的低3位就是 wire_type， tag 右移3位就是 field_number。</p>
+<p>二进制数据中 tag 后面跟的是 length 和 value，下面看一个简单的例子。</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">message </span><span class="title class_">Test4</span> &#123;</span><br><span class="line">  <span class="keyword">repeated</span> <span class="type">int32</span> d = <span class="number">4</span> [packed=<span class="literal">true</span>];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>比如有一个 Test4 结构，其中字段 d 中有三个元素，分别是3，270和86942。那么序列化的数据如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">22        // key (field number 4, wire type 2)</span><br><span class="line">06        // payload size (6 bytes)</span><br><span class="line">03        // first element (varint 3)</span><br><span class="line">8E 02     // second element (varint 270)</span><br><span class="line">9E A7 05  // third element (varint 86942)</span><br></pre></td></tr></table></figure>
+
+
+
+<p>此外，Google提供了官方的直接解析工具，可以在没有 proto 的情况下解析</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">protoc --decode_raw</span><br></pre></td></tr></table></figure>
+
+<p>更详细的内容可见：<a target="_blank" rel="noopener" href="https://developers.google.com/protocol-buffers/docs/encoding">https://developers.google.com/protocol-buffers/docs/encoding</a></p>
+<p>参考文章：<a target="_blank" rel="noopener" href="https://tech.meituan.com/2015/02/26/serialization-vs-deserialization.html">https://tech.meituan.com/2015/02/26/serialization-vs-deserialization.html</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/02/09/Old-Timezone-problem-in-lua/" rel="prev" title="Lua中的时区问题">
+                  <i class="fa fa-chevron-left"></i> Lua中的时区问题
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/11/02/UnrealBuildTool-ProjectFiles/" rel="next" title="UnrealBuildTool生成ProjectFiles">
+                  UnrealBuildTool生成ProjectFiles <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"jozhn/blog-utterances","issue_term":"pathname","theme":"github-light"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

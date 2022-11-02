@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha256-AbA177XfpSnFEvgpYu1jMygiLabzPCJCRIBtR5jGc0k=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"john.js.org","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.13.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="软件测试考点整理 一、软件测试介绍软件缺陷的概念 从产品内部看，软件缺陷是产品开发或维护过程中所存在的错误、毛病等各种问题。 从产品外部看，软件缺陷是系统所需要实现的某种功能的失效或者违背。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="软件测试整理">
+<meta property="og:url" content="https://john.js.org/2018/05/26/Old-software-testing-lesson/index.html">
+<meta property="og:site_name" content="Dear John">
+<meta property="og:description" content="软件测试考点整理 一、软件测试介绍软件缺陷的概念 从产品内部看，软件缺陷是产品开发或维护过程中所存在的错误、毛病等各种问题。 从产品外部看，软件缺陷是系统所需要实现的某种功能的失效或者违背。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-78e8f6ae632311b1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/459">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-b55f16c32b08d5f5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/512">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-ad9bf9ffce77dfe1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/465">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-65d425801fdf9bde.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/444">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/6436460-24307991b7afebe0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/6436460-632354c75889d556.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/6436460-4474fe1d51afbfaa?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-4b742f77aabc9c6b.png?imageMogr2/auto-orient/">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-fe6299cda90575e1.png">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/6436460-df1631c54e33e741.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/6436460-8a945ec7f5bc3c3e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/6436460-6ed75d202ccb403b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/6436460-d5e0697ec4c3ab3c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/6436460-445ccb3c63bcc930.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/6436460-dca3582a9e0486b2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/6436460-2e82f88c04302bff.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/6436460-452fd59c365bbd0c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-956564543e8b2946.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-f783504f8108d10a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/557">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-2924aef22f6da42b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/482">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-f282b42f9c02c946.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/648">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-f341f35792bf0be8.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/563">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-7a815fde0eb93910.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/678">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-3af3f96dc838f2d1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/692">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-7e79cc90a955c2fd.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/661">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-ce7fbe6e599df3d3.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/649">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-34c53a3be76dc056.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/695">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-d304fb2d7159f5e5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/359">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-5df3401dc1fa1826.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/269">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-9956b51233f34570.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/309">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-90131cbc7c78141b.gif?imageMogr2/auto-orient/strip%7CimageView2/2/w/510">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-ea75f95ca29ea390.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/231">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-6345a84c7099802f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/524">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-82175e213519f1c3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/518">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-519297a823a3b4ad.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/502">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-7c460efd22f11f17.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/556">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3403753-ac03996d0f381bfc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/236">
+<meta property="article:published_time" content="2018-05-26T19:33:32.000Z">
+<meta property="article:modified_time" content="2022-11-02T08:39:58.031Z">
+<meta property="article:author" content="John">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/3403753-78e8f6ae632311b1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/459">
+
+
+<link rel="canonical" href="https://john.js.org/2018/05/26/Old-software-testing-lesson/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://john.js.org/2018/05/26/Old-software-testing-lesson/","path":"2018/05/26/Old-software-testing-lesson/","title":"软件测试整理"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>软件测试整理 | Dear John</title>
+  
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Dear John</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">一、软件测试介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E9%BB%91%E7%9B%92%E6%B5%8B%E8%AF%95"><span class="nav-number">2.</span> <span class="nav-text">二、黑盒测试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AD%89%E4%BB%B7%E7%B1%BB"><span class="nav-number">2.1.</span> <span class="nav-text">等价类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%B9%E7%95%8C%E5%80%BC%E5%88%86%E6%9E%90%E6%B3%95"><span class="nav-number">2.2.</span> <span class="nav-text">边界值分析法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A3%E4%BA%A4%E6%B5%8B%E8%AF%95"><span class="nav-number">2.3.</span> <span class="nav-text">正交测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%B3%E7%AD%96%E8%A1%A8"><span class="nav-number">2.4.</span> <span class="nav-text">决策表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%A0%E6%9E%9C%E5%9B%BE"><span class="nav-number">2.5.</span> <span class="nav-text">因果图</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95"><span class="nav-number">3.</span> <span class="nav-text">三、白盒测试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%AD%E5%8F%A5%E8%A6%86%E7%9B%96"><span class="nav-number">3.1.</span> <span class="nav-text">语句覆盖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A4%E5%AE%9A%E8%A6%86%E7%9B%96"><span class="nav-number">3.2.</span> <span class="nav-text">判定覆盖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E8%A6%86%E7%9B%96"><span class="nav-number">3.3.</span> <span class="nav-text">条件覆盖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A4%E5%AE%9A%E6%9D%A1%E4%BB%B6%E8%A6%86%E7%9B%96"><span class="nav-number">3.4.</span> <span class="nav-text">判定条件覆盖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84%E5%90%88%E8%A6%86%E7%9B%96"><span class="nav-number">3.5.</span> <span class="nav-text">组合覆盖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%AF%E5%BE%84%E8%A6%86%E7%9B%96"><span class="nav-number">3.6.</span> <span class="nav-text">路径覆盖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BE%AA%E7%8E%AF%E6%B5%8B%E8%AF%95"><span class="nav-number">3.7.</span> <span class="nav-text">循环测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%B5%81%E6%B5%8B%E8%AF%95"><span class="nav-number">3.8.</span> <span class="nav-text">数据流测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AA%81%E5%8F%98%E6%B5%8B%E8%AF%95"><span class="nav-number">3.9.</span> <span class="nav-text">突变测试</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95"><span class="nav-number">4.</span> <span class="nav-text">四、单元测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E9%9B%86%E6%88%90%E6%B5%8B%E8%AF%95"><span class="nav-number">5.</span> <span class="nav-text">五、集成测试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%A7%E7%88%86%E7%82%B8%E9%9B%86%E6%88%90"><span class="nav-number">5.1.</span> <span class="nav-text">**大爆炸集成 **</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E9%A1%B6%E5%90%91%E4%B8%8B%E9%9B%86%E6%88%90"><span class="nav-number">5.2.</span> <span class="nav-text">自顶向下集成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E9%A1%B6%E5%90%91%E4%B8%8A%E9%9B%86%E6%88%90"><span class="nav-number">5.3.</span> <span class="nav-text">自顶向上集成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E6%98%8E%E6%B2%BB%E9%9B%86%E6%88%90"><span class="nav-number">5.4.</span> <span class="nav-text">三明治集成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E5%B1%82%E9%9B%86%E6%88%90"><span class="nav-number">5.5.</span> <span class="nav-text">分层集成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%AB%98%E9%A2%91%E9%9B%86%E6%88%90"><span class="nav-number">5.6.</span> <span class="nav-text">高频集成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E4%BA%8B%E4%BB%B6%E9%9B%86%E6%88%90"><span class="nav-number">5.7.</span> <span class="nav-text">基于事件集成</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E7%B3%BB%E7%BB%9F%E6%B5%8B%E8%AF%95"><span class="nav-number">6.</span> <span class="nav-text">六、系统测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95"><span class="nav-number">7.</span> <span class="nav-text">七、性能测试</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John</p>
+  <div class="site-description" itemprop="description">notes of tech</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">44</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jozhn" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jozhn" rel="noopener" target="_blank"><i class="github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jozhn@live.com" title="E-Mail → mailto:jozhn@live.com" rel="noopener" target="_blank"><i class="envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://john.js.org/2018/05/26/Old-software-testing-lesson/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Dear John">
+      <meta itemprop="description" content="notes of tech">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="软件测试整理 | Dear John">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          软件测试整理
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-05-26 19:33:32" itemprop="dateCreated datePublished" datetime="2018-05-26T19:33:32+00:00">2018-05-26</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p><strong>软件测试考点整理</strong></p>
+<h2 id="一、软件测试介绍"><a href="#一、软件测试介绍" class="headerlink" title="一、软件测试介绍"></a><strong>一、软件测试介绍</strong></h2><p><strong>软件缺陷的概念</strong></p>
+<p>从产品内部看，软件缺陷是产品开发或维护过程中所存在的错误、毛病等各种问题。</p>
+<p>从产品外部看，软件缺陷是系统所需要实现的某种功能的失效或者违背。</p>
+<span id="more"></span>
+
+<p><strong>软件测试的一个重要功能</strong></p>
+<p>verification(验证）and validation(确认)</p>
+<ul>
+<li>verification：验证我们是不是正确的做了这个产品，也就是产品要符合他的目标</li>
+<li>validation：确认我们是不是做了正确的产品，也就是产品是用户真正想要的</li>
+</ul>
+<p><strong>软件测试的目的</strong></p>
+<ul>
+<li><p>软件测试是为了发现错误而执行程序的过程。</p>
+</li>
+<li><p>一个好的测试能过在第一时间发现程序中存在的错误。</p>
+</li>
+<li><p>一个好的测试是发现了至今尚未发现的错误。</p>
+</li>
+<li><p>减小软件不能正常工作的风险</p>
+</li>
+</ul>
+<p><strong>软件测试的分类</strong></p>
+<ul>
+<li><p>C1：按照测试生成的来源</p>
+</li>
+<li><p>C2：按照生命周期的阶段</p>
+</li>
+<li><p>C3：按照测试活动的目的</p>
+</li>
+<li><p>C4：按被测对象的特征</p>
+</li>
+<li><p>C5：按测试过程的模型</p>
+</li>
+</ul>
+<p><strong>软件测试V模型</strong></p>
+<p> <img src="https://upload-images.jianshu.io/upload_images/3403753-78e8f6ae632311b1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/459" alt="img"> </p>
+<p><strong>软件测试用例</strong></p>
+<p>输入以测试系统和预测这些系统的输出，如果系统根据其规范运作。</p>
+<h2 id="二、黑盒测试"><a href="#二、黑盒测试" class="headerlink" title="二、黑盒测试"></a><strong>二、黑盒测试</strong></h2><h3 id="等价类"><a href="#等价类" class="headerlink" title="等价类"></a><strong>等价类</strong></h3><p>（Equivalence Partitioning）</p>
+<p>分为有效类和无效类，两者不能有重叠的部分</p>
+<p><strong>例子</strong>：写出 NextDate Function（ 1812≤year≤2015 ）的等价类</p>
+<p><strong>有效等价类</strong></p>
+<p>M1 &#x3D; {month：1≤month≤12}</p>
+<p>D1 &#x3D; {date：1≤date≤31}</p>
+<p>Y1 &#x3D; {year：1812≤year≤2015}</p>
+<p><strong>无效等价类</strong></p>
+<p>M2 &#x3D; {month：month&lt;1}</p>
+<p>M3 &#x3D; {month：month&gt;12}</p>
+<p>D2 &#x3D; {date：date&lt;1}</p>
+<p>D3 &#x3D; {date：date&gt;31}</p>
+<p>Y2 &#x3D; {year：year&lt;1812}</p>
+<p>Y3 &#x3D; {year：year&gt;2015}</p>
+<p><strong>再例如</strong>：有一个报表处理系统，要求用户输入处理报表的日期。假如日期限制在2000年1月至2020年12月，即系统只能对该段时期内的报表进行处理。如果用户输入的日期不在这个范围内，则显示“错误信息”。并且此系统规定日期由年月的6位数字组成，前四位代表年，后两位代表月。要求划分日期的等价类。</p>
+<p> 等价类：</p>
+<p> <img src="https://upload-images.jianshu.io/upload_images/3403753-b55f16c32b08d5f5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/512" alt="img"> </p>
+<p>测试用例：</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3403753-ad9bf9ffce77dfe1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/465" alt="img"> </p>
+<h3 id="边界值分析法"><a href="#边界值分析法" class="headerlink" title="边界值分析法"></a><strong>边界值分析法</strong></h3><p>（Boundary Value Analysis）</p>
+<p>基本原理</p>
+<p>边界值分析法是单一错误原则（Single fault），每个测试用例只有一个变量取边界值！</p>
+<p>举例：</p>
+<p>三角形问题，输入a、b、c</p>
+<p>1 ≤ a ≤ 200</p>
+<p>1 ≤ b ≤ 200</p>
+<p>1 ≤ c ≤ 200</p>
+<p>所以a,b,c的取值是</p>
+<p>a &#x3D; {1，2，100，199，200}</p>
+<p>b &#x3D; {1，2，100，199，200}</p>
+<p>c &#x3D; {1，2，100，199，200}</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3403753-65d425801fdf9bde.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/444" alt="3403753-65d425801fdf9bde"> </p>
+<p>测试用例如下</p>
+<p><strong>小结总结</strong></p>
+<ul>
+<li><p>等价类测试的弱形式不如强形式测试全面</p>
+</li>
+<li><p>无效值会引起运行错误的时候（实现语言是强类型），则没有必要做健壮形式的测试。</p>
+</li>
+<li><p>错误条件很重要的时候，健壮测试很重要。</p>
+</li>
+<li><p>边界值测试是等价类测试的一种补充，两者结合可以加强测试效果。</p>
+</li>
+<li><p>决策表技术可以解决变量之间的依赖问题。</p>
+</li>
+<li><p>要进行多次尝试，确认最合适的等价类划分</p>
+</li>
+</ul>
+<h3 id="正交测试"><a href="#正交测试" class="headerlink" title="正交测试"></a><strong>正交测试</strong></h3><p> （Orthogonal Array Testing）</p>
+<p>使用正交试验法，为下面的基本信息查询选取测试用例。</p>
+<p>姓  名： 1-不填  0-填写</p>
+<p>身份证： 1-不填  0-填写</p>
+<p>手机号： 1-不填  0-填写</p>
+<p><strong>正交表</strong></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/6436460-24307991b7afebe0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+<p>第一步：</p>
+<p>计算出需要的测试用例个数</p>
+<p>n＝ ∑（每列的水平数-1）+1  </p>
+<p>＝（2－1）＋（2－1）＋（2－1）＋1  </p>
+<p>＝3×（2－1）＋1  </p>
+<p>＝4</p>
+<p>需要4次实验即可</p>
+<p>第二步：</p>
+<p>根据实验的水平数，和因子个数选择合适的正交表，我们选择第一个</p>
+<p>第三步：</p>
+<p>根据正交表写出测试用例。正交表的每一列对应一个因子（变量），每个取值对应的水平值，即变量的取值。</p>
+<p> <img src="https://upload-images.jianshu.io/upload_images/6436460-632354c75889d556.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+<h3 id="决策表"><a href="#决策表" class="headerlink" title="决策表"></a><strong>决策表</strong></h3><p>（Decision Table）</p>
+<p>决策表有四个部分</p>
+<p>Stub portion、Entry portion、Condition portion、Action portion<br><img src="http://upload-images.jianshu.io/upload_images/6436460-4474fe1d51afbfaa?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p>从问题决策到结果，Y代表条件满足，N代表条件不满足，–代表忽略这个条件</p>
+<p>练习：</p>
+<p>某货运站收费标准如下：如果收件地点在本省，则快件每公斤5元，慢件每公斤3元；如果收件地点在省外，则在20公斤以内（含20公斤）快件每公斤7元，慢件每公斤5元，而超过20公斤时，快件每公斤9元，慢件每公斤7元。请用决策表方法解决此问题。</p>
+<p>第一步：确定规则的数目。</p>
+<p>条件：</p>
+<p>（1）收件地在本省？</p>
+<p>（2）是快件？</p>
+<p>（3）重量不超过20公斤？</p>
+<p>根据公式计算2的3次方＝8</p>
+<p>所以应有8条规则。</p>
+<p>第二步：列出所有的条件桩和行动桩。</p>
+<p>第三步：填入条件条目</p>
+<p>第四步：填入行动条目</p>
+<p> <img src="https://upload-images.jianshu.io/upload_images/3403753-4b742f77aabc9c6b.png?imageMogr2/auto-orient/" alt="img"> </p>
+<p>第五步：化简决策表（一定要合并简化）</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3403753-fe6299cda90575e1.png" alt="img"> </p>
+<h3 id="因果图"><a href="#因果图" class="headerlink" title="因果图"></a><strong>因果图</strong></h3><p>（Cause-Effect Graphing）</p>
+<p><strong>因果图法产生的背景</strong></p>
+<p>等价类划分法和边界值分析方法都是着重考虑输入条件，但没有考虑输入条件的各种组合、输入条件之间的相互制约关系。这样虽然各种输入条件可能出错的情况已经测试到了，但多个输入条件组合起来可能出错的情况却被忽视了。</p>
+<p>如果在测试时必须考虑输入条件的各种组合，则可能的组合数目将是天文数字，因此必须考虑采用一种适合于描述多种条件的组合、相应产生多个动作的形式来进行测试用例的设计，这就需要利用因果图（逻辑模型）。</p>
+<p><strong>因果图概念介绍</strong></p>
+<p>因果图（Cause-EffectGraphing）提供了一个把规格转化为判定表的系统化方法，从该图中可以产生测试数据。其中原因是表示输入条件，结果是对输入执行的一系列计算后得到的输出。因果图方法最终生成的就是判定表，它适合于检查程序输入条件的各种组合情况。</p>
+<p><strong>因果图中基本符号介绍（这里可以看PPT，不全部列出）</strong> </p>
+<ol>
+<li><p>等价 implication<br>  if C1 is 1，then E1 is 1 also，else E1 is 0.<br>  <img src="https://upload-images.jianshu.io/upload_images/6436460-df1631c54e33e741.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+</li>
+<li><p>非 not<br>  if C1 is 1，then E1is 0，else E1 is 1.<br>  <img src="https://upload-images.jianshu.io/upload_images/6436460-8a945ec7f5bc3c3e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+</li>
+<li><p>或 or<br>  if C1or C2 or C3 is 1，then E1 is 1，else E1is 0；“Or” may have arbitrary number of inputs.<br>  <img src="https://upload-images.jianshu.io/upload_images/6436460-6ed75d202ccb403b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+</li>
+<li><p>与 and<br>  if both C1 and C2 are 1，then E1is1，else E1is 0；“And” may have arbitrary number of input.<br>  <img src="https://upload-images.jianshu.io/upload_images/6436460-d5e0697ec4c3ab3c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+</li>
+<li><p>异 exclusive<br>  either C1 or C2<br>  <img src="https://upload-images.jianshu.io/upload_images/6436460-445ccb3c63bcc930.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+</li>
+<li><p>唯一 one and only one<br>  one, and only one, of C1 and C2<br>  <img src="https://upload-images.jianshu.io/upload_images/6436460-dca3582a9e0486b2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+</li>
+<li><p>要求 require<br>  C1 requires C2<br>  <img src="https://upload-images.jianshu.io/upload_images/6436460-2e82f88c04302bff.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+</li>
+<li><p>强制 masking<br>  E1 masks E2<br>  <img src="https://upload-images.jianshu.io/upload_images/6436460-452fd59c365bbd0c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+</li>
+</ol>
+<p><strong>因果图分析步骤</strong><br>第一步，找出Cause（原因）</p>
+<p>Cause（原因）</p>
+<p>c1— the first character is #</p>
+<p>c2 —the first character is *</p>
+<p>c3 —the second character is number</p>
+<p>第二步，找出Effect（结果）</p>
+<p>e1— give the information N</p>
+<p>e2— modify the document</p>
+<p>e3— give the information M</p>
+<p>第三步，分析出中间节点</p>
+<p>然后画出因果图，如图</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3403753-956564543e8b2946.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700" alt="image"></p>
+<p><strong>再举个例子</strong></p>
+<p>某公司对客户有一定的折扣政策，公司软件的一个模块的需求说明书中描述“……当交易额小于等于5万元时折扣为0，当交易额大于5万元时才有折扣，如果交易的客户在三个月内无欠款，则折扣为15%；如果交易用户在三个月内有欠款，若该用户是三年以上的老客户，则折扣为10%；若该客户不是三年以上的老客户，则折扣为5%。”</p>
+<p><strong>原因</strong>（对立的就不要再写了，比如写了是小于五万就不用写大于等于五万了）：</p>
+<p>C1：交易额大于5万元</p>
+<p>C2：三个月无欠款</p>
+<p>C3：三年以上老客户</p>
+<p><strong>结果</strong>（注意对立的就不要再写了）：</p>
+<p>E1：无折扣</p>
+<p>E2：折扣&#x3D;5%</p>
+<p>E3：折扣&#x3D;10%</p>
+<p>E4：折扣&#x3D;15%</p>
+<p><strong>因果图</strong>**</p>
+<p>从这个图中你就能找出导出上边说的四种结果的逻辑</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3403753-f783504f8108d10a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/557" alt="img"> </p>
+<h2 id="三、白盒测试"><a href="#三、白盒测试" class="headerlink" title="三、白盒测试"></a>三、白盒测试</h2><p>白盒测试（white-box testing）也叫structural testing, clear box testing, and glass box testing. </p>
+<p>白盒测试分为<strong>静态测试</strong>和<strong>动态测试</strong></p>
+<p>白盒静态测试：Code inspection, Static structure analysis, Static quality metric method</p>
+<p>白盒动态测试：主要基于覆盖，包括logic coverage, loop coverage, basis path coverage, etc.</p>
+<p>白盒测试主要应用于单元测试</p>
+<p>we can’t use exhaustive（详尽的） testing</p>
+<p><strong>动态测试之逻辑覆盖</strong></p>
+<p>白盒测试用例设计的一个很重要的评估标准就是对代码的覆盖度。一说到覆盖，大家都感觉非常熟悉，但是常见的覆盖都有哪些？各自有什么优缺点？在白盒测试的用例设计中我们应该如何自如地运用呢？为大家总结了一下几种常见的覆盖以及各自的优缺点。</p>
+<p>白盒测试中常见的覆盖有六种：语句覆盖、判定覆盖、条件覆盖、判定&#x2F;条件覆盖、组合覆盖和路径覆盖。下面我们就分别看看这几种不同的覆盖究竟是什么鬼。</p>
+<h3 id="语句覆盖"><a href="#语句覆盖" class="headerlink" title="语句覆盖"></a>语句覆盖</h3><p>（Statement Coverage）</p>
+<p>语句覆盖，顾名思义就是针对代码语句的嘛。它的含义是我们设计出来的测试用例要保证程序中的每一个语句至少被执行一次。通常语句覆盖被认为是“最弱的覆盖”，原因是它仅仅考虑对代码中的执行语句进行覆盖而没有考虑各种条件和分支，因此在实际运用中语句覆盖很难发现代码中的问题。举个非常简单的例子：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public <span class="type">int</span> <span class="title function_">foo</span><span class="params">(<span class="type">int</span> a,<span class="type">int</span> b)</span></span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> a/b;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这是一个求两数之商的函数。如果我们设计如下的测试用例：</p>
+<p>TestCase: a &#x3D; 2, b &#x3D; 1</p>
+<p>这时候我们会发现，该函数的代码覆盖率达到了100%，并且设计的case可以顺利通过测试。</p>
+<p>但是显然该函数有一个很明显的bug：当 b&#x3D;0 时，会抛出异常。</p>
+<p><strong>再来看这个例子：</strong> </p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3403753-2924aef22f6da42b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/482" alt="img"> </p>
+<p><strong>主要特点</strong>：语句覆盖是最起码的结构覆盖要求，语句覆盖要求设计足够多的测试用例，使得程序中每条语句至少被执行一次。</p>
+<p><strong>用例设计</strong>：（<strong>如果此时将A路径上的语句1-&gt;T去掉，那么用例如下</strong>）</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3403753-f282b42f9c02c946.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/648" alt="img"> </p>
+<p><strong>优点</strong>：可以很直观地从源代码得到测试用例，无须细分每条判定表达式。</p>
+<p><strong>缺点</strong>：由于这种测试方法仅仅针对程序逻辑中显式存在的语句，但对于隐藏的条件和可能到达的隐式逻辑分支，是无法测试的。在本例中去掉了语句1—〉T去掉，那么就少了一条测试路径。在if结构中若源代码没有给出else后面的执行分支，那么语句覆盖测试就不会考虑这种情况。但是我们不能排除这种以外的分支不会被执行，而往往这种错误会经常出现。再如，在Do-While结构中，语句覆盖执行其中某一个条件分支。那么显然，语句覆盖对于多分支的逻辑运算是无法全面反映的，它只在乎运行一次，而不考虑其他情况。</p>
+<h3 id="判定覆盖"><a href="#判定覆盖" class="headerlink" title="判定覆盖"></a>判定覆盖</h3><p>（Decision Coverage）</p>
+<p>判定覆盖也被成为分支覆盖(Branch Coverage)，也就是说设计的测试用例要保证让被测试程序中的<strong>每一个分支都至少执行一次</strong>。举个例子,有如下流程图：</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3403753-f341f35792bf0be8.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/563" alt="img"> </p>
+<p>针对该图我们想要做到判定覆盖，可以设计如下case：</p>
+<p>TestCase1: a&#x3D;1, b&#x3D;1  (路径：ab)</p>
+<p>TestCase2: a&#x3D;-1, b&#x3D;-1  (路径：acd)</p>
+<p>TestCase3: a&#x3D;2, b&#x3D;-1  (路径：ace)</p>
+<p>判定覆盖比语句覆盖强一些，能发现一些语句覆盖无法发现的问题。但是往往一些判定条件都是由多个逻辑条件组合而成的，进行分支判断时相当于对整个组合的最终结果进行判断，这样就会忽略每个条件的取值情况，导致遗漏部分测试路径。</p>
+<p><strong>用例设计</strong></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3403753-7a815fde0eb93910.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/678" alt="img"> </p>
+<p><strong>优点</strong>：判定覆盖比语句覆盖要多几乎一倍的测试路径，当然也就具有比语句覆盖更强的测试能力。同样判定覆盖也具有和语句覆盖一样的简单性，无须细分每个判定就可以得到测试用例。</p>
+<p><strong>缺点</strong>：往往大部分的判定语句是由<strong>多个逻辑条件组合</strong>（也就是可能if(a&#x3D;&#x3D;b&amp;&amp;c&#x3D;&#x3D;d)这种的逻辑组合）而成（如，判定语句中包含AND、OR、CASE），若仅仅判断其整个最终结果，而忽略每个条件的取值情况，必然会遗漏部分测试路径。</p>
+<h3 id="条件覆盖"><a href="#条件覆盖" class="headerlink" title="条件覆盖"></a>条件覆盖</h3><p>（Condition Coverage）</p>
+<p>条件覆盖于分支覆盖不同，条件覆盖要求所设计的测试用例能使每个判定中的每一个条件都获得可能的取值，即<strong>每个条件至少有一次真值、有一次假值</strong>。</p>
+<p>仍然以上面<strong>流程图2</strong>作为例子来说明。上图中涉及到的条件一共有4个：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a&gt;0, a&lt;0, b&gt;0, b&lt;0</span><br></pre></td></tr></table></figure>
+<p>为了达到条件覆盖的目的，我们设计的用例需要在 a 点有：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a&gt;0, a&lt;=0, b&gt;0, b&gt;=0，</span><br></pre></td></tr></table></figure>
+<p>这些情况出现，并且在 c 点有：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a&lt;0, a&gt;=0, b&lt;0, b&gt;=0</span><br></pre></td></tr></table></figure>
+<p>这些情况出现。现在可以设计如下用例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">TestCase1: a=1, b=1  (路径：ab)</span><br><span class="line"></span><br><span class="line">TestCase1: a=-1, b=-1  (路径：acd)</span><br><span class="line"></span><br><span class="line">TestCase1: a=-1, b=0  (路径：ace)</span><br><span class="line"></span><br><span class="line">TestCase1: a=1, b=-1  (路径：ace)</span><br></pre></td></tr></table></figure>
+<p>通常而言条件覆盖比判定覆盖强，因为条件覆盖使得判定中的每一个条件都取到了不同的结果，这一点判定覆盖则无法保证。但条件覆盖也有缺陷，因为它只能保证每个条件都取到了不同结果，但没有考虑到判定结果，因此有时候条件覆盖并不能保证判定覆盖。</p>
+<p><strong>优点</strong>：显然条件覆盖比判定覆盖，增加了对符合判定情况的测试，增加了测试路径。</p>
+<p><strong>缺点</strong>：要达到条件覆盖，需要足够多的测试用例，但条件覆盖并不能保证判定覆盖。条件覆盖只能保证每个条件至少有一次为真，而不考虑所有的判定结果。</p>
+<h3 id="判定条件覆盖"><a href="#判定条件覆盖" class="headerlink" title="判定条件覆盖"></a>判定条件覆盖</h3><p>（Decision&#x2F;Condition Coverage）</p>
+<p><strong>针对流程图1的测试用例</strong></p>
+<p>主要特点：设计足够多的测试用例，使得判定中每个条件的所有可能结果至少出现一次，每个判定本身所有可能结果也至少出现一次。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3403753-3af3f96dc838f2d1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/692" alt="img"> </p>
+<p><strong>优点</strong>：判定&#x2F;条件覆盖满足判定覆盖准则和条件覆盖准则，弥补了二者的不足。</p>
+<p><strong>缺点</strong>：判定&#x2F;条件覆盖准则的缺点是未考虑条件的组合情况。</p>
+<h3 id="组合覆盖"><a href="#组合覆盖" class="headerlink" title="组合覆盖"></a>组合覆盖</h3><p>（Branch Condition Combination Coverage）</p>
+<p>组合覆盖也叫做条件组合覆盖。意思是说我们设计的测试用例应该使得每个判定中的各个条件的各种可能组合都至少出现一次。显然，满足条件组合覆盖的测试用例一定是满足判定覆盖、条件覆盖和判定条件覆盖的。</p>
+<p>主要特点：要求设计足够多的测试用例，使得每个判定中条件结果的所有可能组合至少出现一次。</p>
+<p>针对前文提到的<strong>流程图2</strong>，做条件组合覆盖时我们可以设计如下用例：</p>
+<p>TestCase1: a&#x3D;1, b&#x3D;1  (路径：ab)</p>
+<p>TestCase1: a&#x3D;-1, b&#x3D;-1  (路径：acd)</p>
+<p>TestCase1: a&#x3D;-1, b&#x3D;0  (路径：ace)</p>
+<p>TestCase1: a&#x3D;1, b&#x3D;-1  (路径：ace)</p>
+<p><strong>针对流程图1的测试用例</strong></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3403753-7e79cc90a955c2fd.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/661" alt="img"> </p>
+<p><strong>优点</strong>：多重条件覆盖准则满足判定覆盖、条件覆盖和判定&#x2F;条件覆盖准则。更改的判定&#x2F;条件覆盖要求设计足够多的测试用例，使得判定中每个条件的所有可能结果至少出现一次，每个判定本身的所有可能结果也至少出现一次。并且每个条件都显示能单独影响判定结果。</p>
+<p><strong>缺点</strong>：线性地增加了测试用例的数量。</p>
+<h3 id="路径覆盖"><a href="#路径覆盖" class="headerlink" title="路径覆盖"></a>路径覆盖</h3><p>路径覆盖，意思是说我们设计的测试用例可以覆盖程序中所有可能的执行路径。这种覆盖方法可以对程序进行彻底的测试用例覆盖，比前面讲的五种方法覆盖度都要高。那么这种方法是不是就一定最好呢？当然不能讲得这么绝对，它的缺点也是显而易见的：由于需要对所有可能的路径全部进行覆盖，那么我们需要设计数量非常巨大的而且较为复杂的测试用例，用例数量将呈现指数级的增长。所以理论上来讲路径覆盖是最彻底的测试用例覆盖，但实际上很多时候路径覆盖的可操作性不强。</p>
+<p> <strong>针对流程图1</strong> </p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3403753-ce7fbe6e599df3d3.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/649" alt="img"> </p>
+<p><strong>优点</strong>：这种测试方法可以对程序进行彻底的测试，比前面五种的覆盖面都广。</p>
+<p><strong>缺点</strong>：由于路径覆盖需要对所有可能的路径进行测试（包括循环、条件组合、分支选择等），那么需要设计大量、复杂的测试用例，使得工作量呈指数级增长。而在有些情况下，一些执行路径是不可能被执行的</p>
+<p><strong>总结</strong></p>
+<p>以上简单描述了几种不用的逻辑覆盖方法的原则和优劣。在实际的操作中，要正确使用白盒测试的代码覆盖方法，就要从代码分析和代码调研入手，根据调研的结果，可以选择上述方法中的某一种，或者好几种方法的结合，设计出高效的测试用例，尽可能全面地覆盖到代码中的每一个逻辑路径。 </p>
+<p><strong>控制流程图和圈复杂度</strong> </p>
+<p>常见控制流图  </p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3403753-34c53a3be76dc056.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/695" alt="img"> </p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3403753-d304fb2d7159f5e5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/359" alt="img"> </p>
+<p>将上述程序转为控制流图</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3403753-5df3401dc1fa1826.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/269" alt="img"> </p>
+<p><strong>公式</strong>：圈复杂度（独立路径数）&#x3D; 闭合区域数目&#x3D; 二值判定节点数+1 &#x3D; 边数-节点数+2</p>
+<p>注：闭合区域指将平面分成的区域，即包括外面无限大的部分</p>
+<p><strong>例子</strong>：</p>
+<p>计算下图的圈复杂度</p>
+<p>标识它的独立路径</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3403753-9956b51233f34570.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/309" alt="img"> </p>
+<p><strong>独立路径是指程序中至少引进一个新的处理语句集合，采用流图的术语，即独立路径必须至少包含一条在定义路径之前不曾用到的边。</strong> </p>
+<p>圈复杂度（独立路径数）&#x3D;判定节点数（5）+1&#x3D; 6</p>
+<p>独立路径数&#x3D; 闭合区域个数&#x3D; 6</p>
+<p>独立路径数&#x3D; e – n + 2 &#x3D; 13 – 9 + 2 &#x3D; 6 （e为边数，n为结点数 ）</p>
+<p><strong>独立路径</strong>：</p>
+<p>ABCFG</p>
+<p>ABCDFG</p>
+<p>ABDFG</p>
+<p>ABEFG</p>
+<p>ABEDFG</p>
+<p>ABEFGABEFG</p>
+<p><strong>再比如</strong></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3403753-90131cbc7c78141b.gif?imageMogr2/auto-orient/strip%7CimageView2/2/w/510" alt="img"> </p>
+<p><strong>复杂度</strong>&#x3D;闭合区域数&#x3D;4</p>
+<p>&#x3D;二值判定节点数+1&#x3D;3+1&#x3D;4</p>
+<p>&#x3D;e-n+2&#x3D;11-9+2&#x3D;4</p>
+<p><strong>独立路径</strong></p>
+<p>1-11</p>
+<p>1-2-3-4-5-10-1-11</p>
+<p>1-2-3-6-8-9-10-11</p>
+<p>1-2-3-6-7-9-10-1-11</p>
+<p>为了覆盖所有程序语句，必须设计至少4个测试用例使程序运行于这4条路径</p>
+<h3 id="循环测试"><a href="#循环测试" class="headerlink" title="循环测试"></a>循环测试</h3><p>路径覆盖法是一种将程序中循环结构简化成选择结构的测试方法。</p>
+<p>循环简化的目的是限制循环次数，无论循环的形式和循环体实际执行的次数，简化后的循环测试只考虑循环一次或者零次两种情况。</p>
+<p>在这种情况下，循环与判定分支的效果是一样的，即循环要么执行，要么跳过。</p>
+<p><strong>采用较复杂的循环测试策略测试循环，可采用下面测试集：</strong></p>
+<p>跳过整个循环；</p>
+<p>只循环一次；</p>
+<p>只循环两次；</p>
+<p>循环m次，m</p>
+<h3 id="数据流测试"><a href="#数据流测试" class="headerlink" title="数据流测试"></a>数据流测试</h3><h3 id="突变测试"><a href="#突变测试" class="headerlink" title="突变测试"></a>突变测试</h3><p>（Mutation Testing）</p>
+<p>突变测试(mutation testing) , 或称作突变分析、程序突变，它是用于衡量软件测试的质量。突变测试通常对程序的源代码或者目标代码做小的改动，并把截然不同的错误行为（或者怪异行为）作为预期。如果测试代码没有觉察到这种小改动带来的错误，就说明这个测试是有问题的。</p>
+<p>突变测试<strong>目的</strong></p>
+<ul>
+<li>Help testers design high quality tests 设计高质量测试</li>
+<li>Evaluate the quality of existing tests 评估现有测试质量</li>
+</ul>
+<p>突变测试<strong>范围</strong></p>
+<p>unit level、integration level、specification level </p>
+<p>单元级、集成级、规范级 </p>
+<p><strong>下面用一个例子来解释什么是变异测试，考虑以下代码片段：</strong> </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(a &amp;&amp; b)  c = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">else</span> c = <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+
+<p>条件运算符如果用||来替换&amp;&amp;，就会产生以下变异： </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(a || b) c = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">else</span> c = <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+
+<p>为了防止这种突变，测试需要满足以下条件：</p>
+<ol>
+<li>测试数据必须对突变和原始程序引起的不同状态覆盖。如：a&#x3D;1,b&#x3D;0可以达到目的。</li>
+<li>c的值应该传播到程序输出，并被测试检查。</li>
+</ol>
+<p>弱突变覆盖需满足1，强突变覆盖需满足1、2。</p>
+<h2 id="四、单元测试"><a href="#四、单元测试" class="headerlink" title="四、单元测试"></a>四、单元测试</h2><p>（Unit Testing）</p>
+<p>单元测试是最小的测试部分<strong>，</strong>测试模块是独立于其他模块的<strong>，</strong>一般情况下，被测单元能够实现一个特定的功能，并与其他单元有明确的接口定义，这样才可以与其他单元隔离开来。</p>
+<p><strong>In Java, a unit is a class or a class method.</strong></p>
+<p><strong>In C, a unit is a function or sub processes.</strong></p>
+<p>目标：确保模块被正确的编码</p>
+<p>依据：系统详细的规格说明</p>
+<p>过程：经过设计、脚本开发、执行、调试和分析结果一个过程</p>
+<p>执行者：由程序开发人员和测试人员共同完成</p>
+<p>方法：以白盒测试方法为主，辅以黑盒测试方法</p>
+<p>如何进行评估：通过所有单元测试用例，代码没有严重缺陷</p>
+<p><strong>单元测试过程</strong></p>
+<ol>
+<li>在详细设计阶段完成单元测试计划</li>
+<li>建立单元测试环境，完成测试设计和开发</li>
+<li>执行单元测试用例，并且详细记录测试结果</li>
+<li>判定单元测试是否通过</li>
+<li>提交单元测试报告</li>
+</ol>
+<p><img src="https://upload-images.jianshu.io/upload_images/3403753-ea75f95ca29ea390.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/231" alt="img"> </p>
+<p><strong>单元测试优点</strong></p>
+<ol>
+<li>单独进行，一起进行，降低软件质量成本，缩短开发周期；</li>
+<li>便于跟踪错误；</li>
+<li>集成后错误会放大，集成后复杂性高，很难发现问题；</li>
+<li>无需而外的设备和人员。</li>
+</ol>
+<p><strong>单元测试分为静态测试和动态测试</strong></p>
+<p><strong>静态测试</strong></p>
+<p>代码评审：代码走查和正式会议审查。</p>
+<p>代码走查：代码互查应用最多，代码走查是相对比较正式的评审过程，项目组部分成员通过阅读代码，向其他成员提出问题并对有关技术、风格、可能错误是否违背开发标准和规范等进行评论。</p>
+<p>正式会议审查：是一种正式的检查和评估方法，最早由IBM提出，经实践证明，有一种有效的检查办法，从而得到软件工程界的普遍认同。它使用逐步检查源代码中有无逻辑或语法错误的办法来检验故障。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3403753-6345a84c7099802f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/524" alt="img"> </p>
+<h2 id="五、集成测试"><a href="#五、集成测试" class="headerlink" title="五、集成测试"></a>五、集成测试</h2><p>（Integration Testing）</p>
+<p><strong>（集成测试、组装测试、联合测试、子系统测试、部件测试）</strong> </p>
+<p>优点：早点发现错误，早点修正错误，早点获得测试反馈，调度修正错误灵活</p>
+<p>分为<u>增量式测试</u>和<u>非增量式测试</u></p>
+<p><strong>测试模式</strong></p>
+<h3 id="大爆炸集成"><a href="#大爆炸集成" class="headerlink" title="**大爆炸集成 **"></a>**大爆炸集成 **</h3><p>（Big bang integration）</p>
+<p><strong>优点</strong>：完成速度快、能够并行</p>
+<p><strong>缺点</strong>：错误发生时很难找出他的位置和改变以及很多问题得在系统测试才能发现</p>
+<p>适用范围：</p>
+<p>Existing system with only minor modifications</p>
+<p>Small systems with adequate unit testing</p>
+<p>System made from certified high quality reusable components</p>
+<h3 id="自顶向下集成"><a href="#自顶向下集成" class="headerlink" title="自顶向下集成"></a><strong>自顶向下集成</strong></h3><p>（Top-down integration）</p>
+<p>分为广度和深度集成测试</p>
+<p><strong>优点</strong></p>
+<ul>
+<li>早期显示控制和判断要点。 </li>
+<li>采用深度优先装配，可以首先实现和验证完整的软件功能。</li>
+<li>最多只需要一个驱动程序模块。 支持故障隔离。</li>
+</ul>
+<p><strong>缺点</strong></p>
+<ul>
+<li>开发和维护存根的成本都较高。</li>
+<li>底层组件需求无法预测可能导致对顶层组件的许多修改。</li>
+</ul>
+<h3 id="自顶向上集成"><a href="#自顶向上集成" class="headerlink" title="自顶向上集成"></a><strong>自顶向上集成</strong></h3><p>（Bottom-up integration）</p>
+<p><strong>优点</strong></p>
+<ul>
+<li>允许对底层模块进行早期认证，任何叶子节点都可以进行集成测试。</li>
+<li>减少剩余部分开发的工作量</li>
+<li>支持故障隔离</li>
+</ul>
+<p><strong>缺点</strong></p>
+<ul>
+<li>驱动模块开发工作量比较大。 </li>
+<li>高级验证被推迟到结束，无法及时发现设计错误。 </li>
+<li>底盖异常坚硬。</li>
+</ul>
+<h3 id="三明治集成"><a href="#三明治集成" class="headerlink" title="三明治集成"></a><strong>三明治集成</strong></h3><p>Sandwich integration</p>
+<p><strong>优点</strong></p>
+<p>结合自上而下策略和自下而上策略的优势。 </p>
+<p><strong>缺点</strong></p>
+<p>在集成测试之前，中间层测试是不够的。 </p>
+<p><strong>范围</strong></p>
+<p>它被大多数软件开发项目使用。</p>
+<h3 id="分层集成"><a href="#分层集成" class="headerlink" title="分层集成"></a>分层集成</h3><p>Layers integration</p>
+<h3 id="高频集成"><a href="#高频集成" class="headerlink" title="高频集成"></a><strong>高频集成</strong></h3><p>（High-frequency integration）</p>
+<h3 id="基于事件集成"><a href="#基于事件集成" class="headerlink" title="基于事件集成"></a><strong>基于事件集成</strong></h3><p>（Event-based integration）</p>
+<h2 id="六、系统测试"><a href="#六、系统测试" class="headerlink" title="六、系统测试"></a>六、系统测试</h2><p><strong>目的：</strong>测试可安装性、可用性、兼容性、可维护性等等 </p>
+<h2 id="七、性能测试"><a href="#七、性能测试" class="headerlink" title="七、性能测试"></a>七、性能测试</h2><p>性能是量度系统或组件在一定约束条件下，是否达到功能设计的指标：如响应速度，计算的精度，内存利用率。</p>
+<p>性能是系统外部的质量属性基于用户的需求和用户的系统操作性的看法。</p>
+<p>同时性能特别应用于对实时系统的评价当中,就是它的行为在指定的期限内完成正确的操作。</p>
+<p><strong>评估指标为时间效率，空间效率，I∕O性能，数据库性能，内存性能，初始化∕退出时间和资源利用率****延时，事务处理时间，最大事务处理时间，事务操作时间，数据库性能，最大消耗的内存量，高峰内存时间，资源消耗。</strong></p>
+<p><strong>下图描述了web应用的页面响应时间的分解。</strong></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3403753-82175e213519f1c3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/518" alt="img"> </p>
+<p>页面响应时间分解为网络传输时间（N1+N2+N3+N4）和应用延迟时间（A1+A2+A3），</p>
+<p>而应用延迟时间又可分为数据库延迟时间（A2）和应用服务器延迟时间（A1+A3）。</p>
+<p><strong>延迟</strong>：一个指令控制器发出数据请求的一瞬间和数据传送的一瞬间之间的时间间隔;是请求和完成操作之间拖延的时间差。</p>
+<p><strong>事务处理时间：</strong>是指完成一项事务所需要的运行时间，用于评价事务处理效率。通常，事务处理的时间越短，则效率越高。</p>
+<p><strong>并发用户数，一般分两种情况：</strong></p>
+<p>严格意义的并发，即所有用户在同一时间做同一件事情或者操作。</p>
+<p>广义范围的并发，多个用户对系统发出了请求或进行了操作，但这些操作可以是相同的，也可以是不同的。</p>
+<p><strong>吞吐量：</strong>是指在一次性能测试过程中网络上传输数据量的总和。</p>
+<p>一般来说，吞吐量用请求数&#x2F;秒或页面数&#x2F;秒来衡量。</p>
+<p><strong>吞吐量指标有如下两个作用：</strong></p>
+<p>1、协助设计性能测试场景，衡量性能测试场景是否达到了预期的设计目标。</p>
+<p>在设计性能测试场景时，根据估算吞吐量数据测试场景事物发生频率。</p>
+<p>2、协助分析性能测试瓶颈。</p>
+<p><strong>性能测试比较关注业务并发用户数，从业务的角度设置多少并发数合理。</strong></p>
+<p>下面给出估算<strong>并发用户数</strong>的公式：C&#x3D;nL／T</p>
+<p>C —平均的并发用户数</p>
+<p>n —登录会话的数量</p>
+<p>L —登录会话的平均长度</p>
+<p>T —考察的时间段长度</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3403753-519297a823a3b4ad.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/502" alt="img"> </p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3403753-7c460efd22f11f17.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/556" alt="img"> </p>
+<p><strong>例题</strong>：</p>
+<p>一个软件系统每天约有400个用户访问。用户在一天之内有8小时内使用该系统，从登录到退出的平均时间为4小时，请计算该系统的并发用户数和并发用户的峰值各是多少？</p>
+<p>分析：根据公式C&#x3D;400×4／8&#x3D;200</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3403753-ac03996d0f381bfc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/236" alt="img"></p>
+<p><strong>负载测试</strong>是模拟实际软件系统所承受的负载条件的系统负荷，通过不断加载（不断增加模拟用户数量）或其他加载方式来观察不同负载下系统响应时间和数据吞吐量，系统资源占有率（cpu和内存）等性能指标，以检验系统的行为和特性，发现系统可能存在的性能瓶颈、内存泄露和不能实现同步等问题。</p>
+<p><strong>高低突变加载</strong>：某个时间用户数量很大，突然降到很低，过一段时间，又突然加到很高，反复几次。借助这种负载方式的测试，容易发现资源的释放和内存泄漏的问题。</p>
+<p><strong>随机加载方式</strong>：由随机算法自动生成某个数量范围内变化的、动态的负载，这种方式可能是和实际情况最为接近的一种负载方式。虽然不容易模拟系统运行出现的瞬间高峰期，但可以模拟系统长时间的运行过程的状态。</p>
+<p>压力测试用于判定应用处理大量数据的能力。</p>
+<p>压力测试可以成功的测试服务器满负载的情况。</p>
+<p>除了在服务器上增加运行的应用结合客户端测试是一种额外的形式的压力测试。</p>
+<p><strong>性能测试过程：计划，记录，修改，执行，分析</strong></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/05/17/Old-judge-name-with-native-bayes/" rel="prev" title="用朴素贝叶斯根据姓名判断性别">
+                  <i class="fa fa-chevron-left"></i> 用朴素贝叶斯根据姓名判断性别
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/06/09/Old-User-based-KNN-with-LibRec/" rel="next" title="User-based KNN with LibRec">
+                  User-based KNN with LibRec <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments utterances-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="utterances" type="application/json">{"enable":true,"repo":"jozhn/blog-utterances","issue_term":"pathname","theme":"github-light"}</script>
+<script src="/js/third-party/comments/utterances.js"></script>
+
+</body>
+</html>

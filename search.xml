@@ -1,8 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>UnrealBuildTool生成ProjectFiles</title>
+    <url>/2022/11/02/UnrealBuildTool-ProjectFiles/</url>
+    <content><![CDATA[<h2 id="GenerateProjectFiles"><a href="#GenerateProjectFiles" class="headerlink" title="GenerateProjectFiles"></a>GenerateProjectFiles</h2><p>UE中构建项目之前，都需要先执行GenerateProjectFiles，这样UE会通过mono执行UnrealBuildTool（UBT）收集所有模块的<code>Build.cs</code>，然后生成各种编译所需要的文件。比如<code>*.generated.h</code>等等。</p>
+<p>在不同平台、不同IDE下还需要生成不同结构的配置，因为Xcode、VS、Rider的工程配置文件是各不相同的，UBT源码中需要分类去处理。</p>
+<p>以VS为例，UBT会为VS生成<code>.sln</code>以及各种模块的<code>.vcxproj</code>文件，里面包含了各个模块的宏定义以及include path，都是由<code>Build.cs</code>生成出来的。这样IDE在打开工程时才知道模块的宏是什么，引用的路径有哪些，也就是常说的IntelliSense功能。<strong>当然，更重要的是能让编译器在编译时找到</strong>。</p>
+<span id="more"></span>
+
+<h2 id="支持的IDE"><a href="#支持的IDE" class="headerlink" title="支持的IDE"></a>支持的IDE</h2><p>除了VS，UBT还支持为其他的一些IDE或者编译工具生成对应的配置文件。IDE主要是Xcode和Rider&#x2F;CLion，还有一些小众一点的比如CodeLite、Eddie、KDevelop。编译工具支持CMake、Make、QMake等。</p>
+<p><img src="https://img.jozhn.com/blog/202211011016185.png"></p>
+<p>大部分情况我们都是用VS&#x2F;Xcode&#x2F;Rider。我在Windows和Mac上都用Rider，因为基于UE定制了一些功能，可以自动生成Generate，而且IntelliSense和查找功能也比较强大。</p>
+<h2 id="UBT参数"><a href="#UBT参数" class="headerlink" title="UBT参数"></a>UBT参数</h2><p><a href="https://docs.unrealengine.com/4.27/en-US/ProductionPipelines/BuildTools/UnrealBuildTool/ProjectFilesForIDEs/">Project Files for IDEs | Unreal Engine 4.27 Documentation</a></p>
+<p>UE官方给的UBT参数文档很粗糙，只是把一部分参数列出来了，没有说清楚什么时候使用哪些参数，各有什么作用。这里简单介绍一些有用的参数。</p>
+<ol>
+<li>指定IDE配置<ol>
+<li>可选参数”-ProjectFiles” “-Rider” “-XCodeProjectFiles”等</li>
+<li>一般默认是”-ProjectFiles”，会生成VS的配置文件和平台必须的文件</li>
+<li>可以自己调用换成”-Rider”或”-XCodeProjectFiles”生成Rider和Xcode的配置</li>
+<li>可以多个组合，但需要运行的平台支持（Win没法生成Xcode的），所以没什么卵用</li>
+</ol>
+</li>
+<li>-Platforms<ol>
+<li>生成平台，生成ProjectFiles时仅可选Editor支持的平台，包括Win64&#x2F;Win32&#x2F;Mac&#x2F;Linux</li>
+<li>决定了PLATFORM_XXX等宏的生成</li>
+</ol>
+</li>
+<li>-TargetTypes<ol>
+<li>运行模式，Editor或者Game</li>
+<li>决定了WITH_EDITOR等相关宏的生成</li>
+</ol>
+</li>
+<li>-TargetConfigurations<ol>
+<li>UE编译选项，UnrealTargetConfiguration</li>
+<li>可选Debug&#x2F;DebugGame&#x2F;Development&#x2F;Shipping&#x2F;Test</li>
+<li>决定了UE_BUILD_XXX宏的生成</li>
+</ol>
+</li>
+<li>-project<ol>
+<li>.uproject绝对路径</li>
+<li>控制为哪个项目生成配置</li>
+</ol>
+</li>
+</ol>
+<p>参数示例(便于展示参数换行了)：</p>
+<p>Windows</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">./UnrealBuildTool.exe</span><br><span class="line">-Rider</span><br><span class="line">-Platforms=Win64</span><br><span class="line">-TargetTypes=Game</span><br><span class="line">-TargetConfigurations=Shipping</span><br><span class="line">-project=<span class="string">&quot;C:\xxx\Game.uproject&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>Mac或Linux下需要使用mono调用UBT</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">mono <span class="string">&quot;xxx/UnrealBuildTool.exe&quot;</span></span><br><span class="line">-Rider</span><br><span class="line">-Platforms=Mac</span><br><span class="line">-TargetTypes=Game</span><br><span class="line">-TargetConfigurations=Shipping</span><br><span class="line">-project=<span class="string">&quot;C:\xxx\Game.uproject&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>这样就可以为Rider生成Game项目的Game模式的Shipping编译配置。</p>
+<p>一般可以修改TargetTypes更换成Editor模式，或者修改TargetConfigurations来切换编译选项。<br><strong>Platforms只能选当前所使用的的桌面平台，不支持生成移动平台的</strong>，因为生成中的一些操作依赖操作系统的环境，并且UBT代码中做了限制。</p>
+<p>不过我们可以修改UBT代码来跳过这个限制，注释以下代码然后重新编译UBT即可在Windows生成Android的配置，在Mac生成Android和IOS的配置。Windows不能生成IOS和Mac的配置，因为生成过程依赖Xcode环境。</p>
+<p><img src="https://img.jozhn.com/blog/202211011455309.png"></p>
+<p>Rider生成之后会产生json配置文件，文件路径：<br><code>&#123;GameRoot&#125;/Intermediate/ProjectFiles/.Rider/&#123;Platform&#125;/&#123;Configuration&#125;/&#123;TargetType&#125;/&#123;ProjectName&#125;.json</code> </p>
+<p>同目录下除了<code>&#123;ProjectName&#125;.json</code>还有一个<code>UE4.json</code> ，里面包含了所需要的全部编译参数和include path。</p>
+<h2 id="IDE配置文件"><a href="#IDE配置文件" class="headerlink" title="IDE配置文件"></a>IDE配置文件</h2><p>各个IDE的配置各不相同，Xcode是<code>.xcodeproj</code>文件，VS是<code>.vcxproj</code>文件，而Rider是<code>.json</code>文件。</p>
+<p>很显然，Rider的文件最方便我们读取使用，而且Win和Mac都支持生成。</p>
+<p>这个配置文件对我们有什么作用？</p>
+<p>这些配置文件是给IDE或编译工具使用的，正常开发游戏确实用不到这个。但是如果你需要导出指定平台的特点条件下的宏的时候，就需要使用UBT去导出，而如果想不修改UBT就做到这一点，只能像我说的这样调用UBT生成Rider配置文件，然后读取。</p>
+<p>其中有用的信息之一是EnvironmentDefinitions，包含了引擎和Game全局的宏定义，其他的宏定义也都来自这些宏。</p>
+<p><img src="https://img.jozhn.com/blog/202211011028156.png"></p>
+<p>其次是各个模块的参数，PublicIncludePaths和PrivateIncludePaths包含了这个模块的全部include path。最重要的是ThirdParty下的各个模块，因为这些第三方库的文件路径并不遵循UE的Public&#x2F;Private文件夹的模式，想收集这些include path会很困难，所以UE通过Build.cs来为这些模块添加include path，并且通过UBT收集然后导出给IDE和编译工具。</p>
+<h2 id="调试UBT"><a href="#调试UBT" class="headerlink" title="调试UBT"></a>调试UBT</h2><p>UBT是个命令行程序，执行速度很快，想要调试的话是不方便通过attach的方式调试的，最好的办法是通过debug模式启动。</p>
+<p>首先在IDE中切换项目为UBT：</p>
+<p><img src="https://img.jozhn.com/blog/202211011013293.png"></p>
+<p>然后修改UBT的启动参数，添加自己需要的参数</p>
+<p><img src="https://img.jozhn.com/blog/202211011015617.png"></p>
+<p>最后在需要的地方断点，然后debug启动即可。</p>
+]]></content>
+  </entry>
+  <entry>
     <title>Anti-entropy and Gossiping</title>
-    <url>/2017/12/17/Anti-entropy-and-Gossiping/</url>
+    <url>/2017/12/17/Old-Anti-entropy-and-Gossiping/</url>
     <content><![CDATA[<h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><blockquote>
 <p>N个节点，使用P2P方法，分别写出使用anti-entropy和gossiping传播模型的求分布式平均数算法。</p>
 </blockquote>
@@ -16,7 +87,7 @@
   </entry>
   <entry>
     <title>Unity C# 编译集成 Google Protobuf</title>
-    <url>/2020/11/17/CSharp-Compile-With-Google-Protobuf/</url>
+    <url>/2020/11/17/Old-CSharp-Compile-With-Google-Protobuf/</url>
     <content><![CDATA[<p>踩了很多坑，因为网上几年前基本上都是用第三方 <code>protobuf-net</code> 库来作为 C# 的 Protobuf 工具使用的，尤其是 Unity 。所以关于 Google 官方的 C# 集成到 Unity 基本没人使用，C# 非 Unity 的开发（比如 .net ）可以通过VS的 Nuget 快速集成 Protobuf，在 Unity 上这样做只能够在 VS 编辑器下检测到这个库，而 Unity 编辑器是不知道的，所以不能用这种方式。</p>
 <p>而直接接入源码也会因为缺少依赖报错无法解决，最终还是采用自己编译出DLL集成的方式来接入。</p>
 <p>另外前提是 Unity 切换成 <code>.net4.x</code>，因为 Google Protobuf 需要 4.5+。</p>
@@ -83,7 +154,7 @@
   </entry>
   <entry>
     <title>Effective C# 之 C#的编程习惯</title>
-    <url>/2020/08/31/Effective-Csharp-Idioms/</url>
+    <url>/2020/08/31/Old-Effective-Csharp-Idioms/</url>
     <content><![CDATA[<p>目前网络上的《Effective C#》笔记都是基于07年出版的原书第二版的翻译版本，如今很多理论已经过时，而最新的第三版的中文版已经在18年出版，因此这里分享一下第一章节C#的编程习惯的读书笔记。</p>
 <span id="more"></span>
 
@@ -216,7 +287,7 @@
   </entry>
   <entry>
     <title>Git 初步</title>
-    <url>/2018/05/17/Git-introduction/</url>
+    <url>/2018/05/17/Old-Git-introduction/</url>
     <content><![CDATA[<h3 id="Git-init"><a href="#Git-init" class="headerlink" title="Git init"></a>Git init</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git init</span><br></pre></td></tr></table></figure>
 <span id="more"></span>
 <h3 id="Git-remote-add"><a href="#Git-remote-add" class="headerlink" title="Git remote add"></a>Git remote add</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git remote add origin git@github.com:yourName/yourRepo.git</span><br></pre></td></tr></table></figure>
@@ -247,7 +318,7 @@
   </entry>
   <entry>
     <title>KMP模式匹配</title>
-    <url>/2018/11/09/KMP-algorithm/</url>
+    <url>/2018/11/09/Old-KMP-algorithm/</url>
     <content><![CDATA[<p>记录一下KMP求next和nextval数组的方法</p>
 <h3 id="KMP之求next数组"><a href="#KMP之求next数组" class="headerlink" title="KMP之求next数组"></a>KMP之求next数组</h3><blockquote>
 <p>举例：<br>模式串  a  b  a  a  b  c  a  c<br>next值  0  1  1  2  2  3  1  2</p>
@@ -275,7 +346,7 @@
   </entry>
   <entry>
     <title>Linux入门</title>
-    <url>/2017/12/18/Linux-basics/</url>
+    <url>/2017/12/18/Old-Linux-basics/</url>
     <content><![CDATA[<h3 id="熟悉Linux环境"><a href="#熟悉Linux环境" class="headerlink" title="熟悉Linux环境"></a>熟悉Linux环境</h3><h4 id="常用Shell命令"><a href="#常用Shell命令" class="headerlink" title="常用Shell命令"></a>常用Shell命令</h4><ul>
 <li>目录操作<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir abc //创建一个目录 abc</span><br><span class="line">cd /abc //将工作目录改变到 abc</span><br><span class="line">cd //改变当前目录到主目录</span><br><span class="line">ls //列出当前目录的内容</span><br><span class="line">ls -l //输出当前目录内容的长列表，每个目录或文件占一行</span><br><span class="line">pwd //显示当前目录的全路径</span><br></pre></td></tr></table></figure></li>
 </ul>
@@ -298,7 +369,7 @@
   </entry>
   <entry>
     <title>Lua运行时热更新的实现</title>
-    <url>/2020/10/27/Lua-Runtime-Hotfix/</url>
+    <url>/2020/10/27/Old-Lua-Runtime-Hotfix/</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>常见的Lua热更新都是在客户端下载所有Lua代码之后重启游戏，以实现重载所有数据和函数的目的。但在实际开发过程中，如果每次都要改完Lua代码重启游戏，正常人都不能接受。</p>
 <p>除这种热更方式之外，其实还可以实现运行时热更，或者叫无感知热更。可以做到在玩家运行游戏的时候偷偷更新一部分代码。</p>
 <span id="more"></span>
@@ -379,7 +450,7 @@
   </entry>
   <entry>
     <title>Lua实现print调用Unity输出日志</title>
-    <url>/2020/11/12/Lua-print-Output-to-Unity/</url>
+    <url>/2020/11/12/Old-Lua-print-Output-to-Unity/</url>
     <content><![CDATA[<p>在 tolua 和 xlua 中，调用 print 会直接在 Unity 控制台输出日志。而实际上 Lua 的源码中 print 只是输出日志，想要传递到 C# 需要额外做一些操作。</p>
 <span id="more"></span>
 
@@ -402,7 +473,7 @@
   </entry>
   <entry>
     <title>LuaJIT在各平台的编译方法</title>
-    <url>/2021/01/05/LuaJIT-Compile/</url>
+    <url>/2021/01/05/Old-LuaJIT-Compile/</url>
     <content><![CDATA[<p>LuaJIT 可以将 lua 代码编译为字节码然后解释执行，增加反编译的难度。</p>
 <p>通过对 LuaJIT 引擎的源码进行定制，将其生成的 LuaJIT 字节码的 opcode 随机化地打乱、增加干扰的opcode、文件格式变换。这样反编译的难度会进一步提高。下面记录一下编译 LuaJIT 的过程。</p>
 <span id="more"></span>
@@ -427,7 +498,7 @@
   </entry>
   <entry>
     <title>NGUI图集与Drawcall</title>
-    <url>/2019/10/16/NGUI-atlas-and-drawcall/</url>
+    <url>/2019/10/16/Old-NGUI-atlas-and-drawcall/</url>
     <content><![CDATA[<p>Unity中常用的界面是NGUI和UGUI，他们都用来创建界面，而NGUI学习成本更低。</p>
 <p>在Unity渲染界面的时候，总体上会根据层级自下向上地渲染。其中，UIPanel的优先级最高，我们可以认为Unity首先会按照UIPanel的层级把prefab排序，而子物体们则会在UIPanel的层级上再根据层级排序。另外，即使一个UIPanel挂在另一个UIPanel的下面，也属于不同的层级。</p>
 <p>然后由于有这样的渲染顺序，所以我们需要合理安排各个组件的层级，让使用相同美术素材的组件在接近的层级上，不同美术素材的组件尽量远一些。</p>
@@ -443,7 +514,7 @@
   </entry>
   <entry>
     <title>NGUI屏幕适配原理与计算</title>
-    <url>/2019/11/17/NGUI-screen-resolution-compute/</url>
+    <url>/2019/11/17/Old-NGUI-screen-resolution-compute/</url>
     <content><![CDATA[<p>NGUI中的屏幕尺寸是设计者决定的，那么在不同的手机或者电脑下是怎么适配的呢？研究了半天，下面记录一下研究的结果。</p>
 <span id="more"></span>
 
@@ -467,7 +538,7 @@
   </entry>
   <entry>
     <title>NGUI Prefab Toolbar缩略图生成</title>
-    <url>/2020/06/01/NGUI-thumbnail/</url>
+    <url>/2020/06/01/Old-NGUI-thumbnail/</url>
     <content><![CDATA[<p>NGUI的Prefab Toolbar可以放一些prefab模板，但是在新版Unity上无法显示缩略图，因此写了个工具为选中的NGUI prefab生成缩略图。</p>
 <span id="more"></span>
 
@@ -484,7 +555,7 @@
   </entry>
   <entry>
     <title>Nginx的进程与并发分析</title>
-    <url>/2017/12/27/Nginx-processes/</url>
+    <url>/2017/12/27/Old-Nginx-processes/</url>
     <content><![CDATA[<h4 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h4><p>Linux操作系统作业，要求阅读一个中型程序源码，如Apache、Nginx等，写一份阅读报告，给出其运行机制，及运行机制对应关键代码。</p>
 <p>需要给出一定细节：配置参数的对运行的影响，相应的源码位置等。</p>
 <p>作业提交包括：一份报告。</p>
@@ -508,7 +579,7 @@
   </entry>
   <entry>
     <title>Nginx反向代理与缓存配置</title>
-    <url>/2020/06/01/Nginx-reverse-proxy/</url>
+    <url>/2020/06/01/Old-Nginx-reverse-proxy/</url>
     <content><![CDATA[<p>有时候需要用Nginx在内网部署反向代理给内网的程序访问外网内容，并设置一定时间的缓存，记录一下。</p>
 <span id="more"></span>
 
@@ -565,7 +636,7 @@
   </entry>
   <entry>
     <title>QT使用EasyPR识别车牌的正确方式</title>
-    <url>/2018/07/17/QT-and-EasyPr/</url>
+    <url>/2018/07/17/Old-QT-and-EasyPr/</url>
     <content><![CDATA[<h2 id="前提条件"><a href="#前提条件" class="headerlink" title="前提条件"></a>前提条件</h2><ul>
 <li>QT5.3.0 with MinGW</li>
 <li>opencv3.0+</li>
@@ -624,7 +695,7 @@
   </entry>
   <entry>
     <title>QT下运行用MinGW编译的OpenCV简明教程</title>
-    <url>/2018/06/20/QT-with-MinGW-built-OpenCV/</url>
+    <url>/2018/06/20/Old-QT-with-MinGW-built-OpenCV/</url>
     <content><![CDATA[<h2 id="Requirements"><a href="#Requirements" class="headerlink" title="Requirements"></a>Requirements</h2><ul>
 <li><code>Windows 7 or later</code></li>
 <li><code>QT 5.3.0 with MinGW4.8.2</code> (下载已经编译好的<code>OpenCV</code>可以忽略下面两项)</li>
@@ -667,7 +738,7 @@
   </entry>
   <entry>
     <title>Skinned Mesh Renderer多层材质赋值</title>
-    <url>/2019/09/19/Skinned-Mesh-Renderer/</url>
+    <url>/2019/09/19/Old-Skinned-Mesh-Renderer/</url>
     <content><![CDATA[<p>Unity中Skinned Mesh Renderer上的材质可以挂多个，而Skinned Mesh Renderer有两个属性可以用来访问材质，一个是material，另一个是materials。</p>
 <span id="more"></span>
 
@@ -686,7 +757,7 @@
   </entry>
   <entry>
     <title>Solution for 8 Puzzle</title>
-    <url>/2018/04/05/Solution-for-8-Puzzle/</url>
+    <url>/2018/04/05/Old-Solution-for-8-Puzzle/</url>
     <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>八数码问题：在一个<code>3*3</code>的方棋盘上放置着1,2,3,4,5,6,7,8八个数码,每个数码占一格,且有一个空格。这些数码可以在棋盘上移动，其移动规则是：与空格相邻的数码方格可以移入空格。现在的问题是：对于指定的初始棋局和目标棋局，给出数码的移动序列。该问题称八数码难题或者重排九宫问题。在本文中，我将展示如何编写一个程序，使用<code>Python</code>和<code>PyGame</code>以及A *算法解决八数码问题。</p>
 <span id="more"></span>
 
@@ -722,7 +793,7 @@
   </entry>
   <entry>
     <title>SourceTree提交Github失败解决方法</title>
-    <url>/2019/09/11/SourceTree-login-Github/</url>
+    <url>/2019/09/11/Old-SourceTree-login-Github/</url>
     <content><![CDATA[<p>使用SourceTree提交代码到Github时会要求登录Github账号，但是输入正确的账号密码也会出现账号密码错误的提示，实际上并不是账号密码错了，而是Windows的SSL协议版本的问题。</p>
 <span id="more"></span>
 
@@ -732,7 +803,7 @@
   </entry>
   <entry>
     <title>Lua中的时区问题</title>
-    <url>/2021/02/09/Timezone-problem-in-lua/</url>
+    <url>/2021/02/09/Old-Timezone-problem-in-lua/</url>
     <content><![CDATA[<p>Lua 中的 <code>os.time()</code> 获取的时间是当前设备的时间，但是当前设备是可以修改时间的，所以这个接口并不可靠。另外如果设备修改了时区，这个接口也没有提供获取指定时区当前时间的功能。</p>
 <p>这样在各种需要显示时间以及根据时间判断是否开放系统的地方很可能因此出现问题。所以需要自己封装一些接口来获取服务器时区对应的时间。因为游戏时间肯定是以服务器所在时区显示为准。</p>
 <span id="more"></span>
@@ -754,7 +825,7 @@
   </entry>
   <entry>
     <title>Unity AndroidManifest Style的修改</title>
-    <url>/2020/06/04/Unity-AndroidManifest-Style/</url>
+    <url>/2020/06/04/Old-Unity-AndroidManifest-Style/</url>
     <content><![CDATA[<p>Unity 的AndroidManifest和安卓开发的AndroidManifest是有一点区别的，很多属性并不能使用，设置样式的时候需要注意。</p>
 <span id="more"></span>
 
@@ -773,7 +844,7 @@
   </entry>
   <entry>
     <title>制作 Unity Animation 事件编辑器</title>
-    <url>/2020/07/30/Unity-Animation-Event-Editor/</url>
+    <url>/2020/07/30/Old-Unity-Animation-Event-Editor/</url>
     <content><![CDATA[<p>Unity 的人物动作模型fbx文件中一般会有一个或多个 Animation 动画，为了配合音效，我们需要给 Animation 添加事件，Unity自带的Inspector可以实现简单的事件编辑，不过缺点是不能预览动作和音效事件的配合。因此可以自己制作工具来实现在运行时的事件编辑器。</p>
 <span id="more"></span>
 
@@ -810,7 +881,7 @@
   </entry>
   <entry>
     <title>Unity Animator Controller复制产生的冗余依赖</title>
-    <url>/2020/07/30/Unity-Animator-Bug-of-Copy/</url>
+    <url>/2020/07/30/Old-Unity-Animator-Bug-of-Copy/</url>
     <content><![CDATA[<p>Unity 的 Animator Controller 在游戏中一般用来做动画状态机，存放一个游戏中人物或物体的各种动画，便于程序调用。</p>
 <p>由于很多人物的动画状态机结构基本一致，我们在使用时常常直接复制 Animator Controller 或者复制其中的节点到另外一个 Animator Controller 中。</p>
 <p>但实际操作中，这样会产生冗余数据和不必要的引用关系。</p>
@@ -858,7 +929,7 @@
   </entry>
   <entry>
     <title>Unity CacheServer搭建与使用</title>
-    <url>/2020/06/04/Unity-CacheServer-build-and-use/</url>
+    <url>/2020/06/04/Old-Unity-CacheServer-build-and-use/</url>
     <content><![CDATA[<p>Unity CacheServer是Unity的缓存服务器，支持部署在多平台。有了缓存服务器，Hold on会快很多。</p>
 <span id="more"></span>
 
@@ -909,7 +980,7 @@
   </entry>
   <entry>
     <title>Unity NGUI元素位置计算与截图</title>
-    <url>/2019/11/03/Unity-NGUI-position/</url>
+    <url>/2019/11/03/Old-Unity-NGUI-position/</url>
     <content><![CDATA[<h2 id="Rect"><a href="#Rect" class="headerlink" title="Rect"></a>Rect</h2><p>Unity中的Rect包含x, y, width, height四个参数，分别是到屏幕左侧的距离、到屏幕底部的距离以及矩形的宽和高，需要注意的是这就代表着Rect是从左下角开始计算的。</p>
 <span id="more"></span>
 
@@ -941,7 +1012,7 @@
   </entry>
   <entry>
     <title>Unity Splash黑屏问题解决——使用Android Studio实现Splash</title>
-    <url>/2020/06/01/Unity-Splash-Implemented-in-Android/</url>
+    <url>/2020/06/01/Old-Unity-Splash-Implemented-in-Android/</url>
     <content><![CDATA[<p>Unity Splash之前会有几秒的黑屏，即使是打个空包也会有一两秒，很难接受，所以要解决这个问题必须写Java代码，在安卓app启动时展示Splash logo，而不是在Unity activity中展示。</p>
 <span id="more"></span>
 
@@ -997,7 +1068,7 @@
   </entry>
   <entry>
     <title>Unity关闭游戏预览时崩溃的解决方法</title>
-    <url>/2019/09/20/Unity-crash-when-exit-game/</url>
+    <url>/2019/09/20/Old-Unity-crash-when-exit-game/</url>
     <content><![CDATA[<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>在使用Unity 2017.4.16开发时经常遇到关闭游戏预览的时候Unity Crash的情况，经过查询log文件可以找到出问题的原因。要注意的是，每一次运行Unity的时候会重新创建这个文件，所以崩溃之后要立即去查看或者把日志保存下来。</p>
 <span id="more"></span>
 
@@ -1016,7 +1087,7 @@
   </entry>
   <entry>
     <title>User-based KNN with LibRec</title>
-    <url>/2018/06/09/User-based-KNN-with-LibRec/</url>
+    <url>/2018/06/09/Old-User-based-KNN-with-LibRec/</url>
     <content><![CDATA[<p>本项目使用领先的推荐系统Java开源工具库<code>LibRec</code>完成，实现其中的<code>UserKNN</code>算法，并使用<code>struts2</code>框架完成简单的网页展示。</p>
 <span id="more"></span>
 
@@ -1209,7 +1280,7 @@
   </entry>
   <entry>
     <title>Web server with thread pool</title>
-    <url>/2017/06/30/Web-server-with-thread-pool/</url>
+    <url>/2017/06/30/Old-Web-server-with-thread-pool/</url>
     <content><![CDATA[<blockquote>
 <p>The goals of this project are:</p>
 <ul>
@@ -1235,7 +1306,7 @@
   </entry>
   <entry>
     <title>Windows10安装tensorflow</title>
-    <url>/2018/05/15/Windows10-install-tensorflow/</url>
+    <url>/2018/05/15/Old-Windows10-install-tensorflow/</url>
     <content><![CDATA[<h3 id="Requirements"><a href="#Requirements" class="headerlink" title="Requirements"></a>Requirements</h3><ol>
 <li>Python3.X</li>
 <li>Windows10</li>
@@ -1265,7 +1336,7 @@
   </entry>
   <entry>
     <title>Windows10下的AlphaPose配置教程</title>
-    <url>/2019/02/10/Windows10-with-AlphaPose/</url>
+    <url>/2019/02/10/Old-Windows10-with-AlphaPose/</url>
     <content><![CDATA[<h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>AlphaPose是一个精确的多人姿态估计器，它在COCO、MPII等数据集上效果显著高于其他已开源系统，而且同时支持Linux和Windows，并且是交大MVIG组开发的，所以来尝试一下。另外AlphaPose还提供了基于PyTorch平台的源码，可以说很方便使用了，并且安装教程也很详细。</p>
 <span id="more"></span>
 
@@ -1306,7 +1377,7 @@
   </entry>
   <entry>
     <title>Docker-compose搭建weibo-rss订阅微博</title>
-    <url>/2019/10/24/build-weibo-rss-with-docker-compose/</url>
+    <url>/2019/10/24/Old-build-weibo-rss-with-docker-compose/</url>
     <content><![CDATA[<p><a href="https://github.com/zgq354/weibo-rss">weibo-rss</a>是一个把微博转为rss订阅的爬虫，使用node.js编写，会定时爬取指定微博账号的首页最新10条，可以完整保留图片、视频和超链接。支持Docker-compose一键部署，很方便。</p>
 <span id="more"></span>
 
@@ -1367,7 +1438,7 @@
   </entry>
   <entry>
     <title>混沌分形作业</title>
-    <url>/2018/05/06/chaos-and-fractal/</url>
+    <url>/2018/05/06/Old-chaos-and-fractal/</url>
     <content><![CDATA[<h3 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h3><blockquote>
 <p><strong>1.</strong> 当前网络上谣言的传播对社会造成了很多不利的影响，请根据所掌握的网络科学知识，在当今互联网结构上，给出一种舆情监控的方法，进而给出抑制谣言传播的办法。<br>不少于2页A4纸，有算法设计与分析，给出参考文献。</p>
 </blockquote>
@@ -1379,7 +1450,7 @@
   </entry>
   <entry>
     <title>hexo安装过程</title>
-    <url>/2018/03/30/hexo-install/</url>
+    <url>/2018/03/30/Old-hexo-install/</url>
     <content><![CDATA[<ul>
 <li><p>安装Node.js</p>
 </li>
@@ -1396,7 +1467,7 @@
   </entry>
   <entry>
     <title>用朴素贝叶斯根据姓名判断性别</title>
-    <url>/2018/05/17/judge-name-with-native-bayes/</url>
+    <url>/2018/05/17/Old-judge-name-with-native-bayes/</url>
     <content><![CDATA[<h3 id="条件概率与贝叶斯定理"><a href="#条件概率与贝叶斯定理" class="headerlink" title="条件概率与贝叶斯定理"></a>条件概率与贝叶斯定理</h3><p>对于事件A和B，当B发生的情况下，A发生的条件概率为<br>$$<br>P(A|B) &#x3D; \frac{P(AB)}{P(B)}.<br>$$<br>如果把$$P(AB)$$表示为$$P(B|A)P(A)$$，那么 就有<br>$$<br>P(A|B) &#x3D; \frac{P(B|A)P(A)}{P(B)}.<br>$$</p>
 <span id="more"></span>
 
@@ -1409,7 +1480,7 @@
   </entry>
   <entry>
     <title>操作系统实验</title>
-    <url>/2017/07/01/os-homework/</url>
+    <url>/2017/07/01/Old-os-homework/</url>
     <content><![CDATA[<p>记录操作系统课程的几个实验</p>
 <h4 id="实验一-进程的同步与互斥"><a href="#实验一-进程的同步与互斥" class="headerlink" title="实验一_进程的同步与互斥"></a>实验一_进程的同步与互斥</h4><blockquote>
 <p>通过学习和分析基础例子程序，使用windows进程和线程编程（也可以采用Java 或Unix&#x2F;Linux的POSIX线程编程）实现一个简单的生产者&#x2F;消费者问题的程序。</p>
@@ -1455,7 +1526,7 @@
   </entry>
   <entry>
     <title>Websocket将Unity日志输出到网页</title>
-    <url>/2019/11/29/output-Unity-log-to-web-with-Websocket/</url>
+    <url>/2019/11/29/Old-output-Unity-log-to-web-with-Websocket/</url>
     <content><![CDATA[<p>Unity中查看日志时如果很多就会特别卡，或者在手机上时查看日志很费劲，尝试了一下用Websocket输出到网页上，方便查看。</p>
 <span id="more"></span>
 
@@ -1484,7 +1555,7 @@
   </entry>
   <entry>
     <title>序列化和反序列化</title>
-    <url>/2021/03/14/protobuf-and-json/</url>
+    <url>/2021/03/14/Old-protobuf-and-json/</url>
     <content><![CDATA[<p>互联网的产生带来了机器间通讯的需求，而互联通讯的双方需要采用约定的协议，序列化和反序列化属于通讯协议的一部分。</p>
 <ul>
 <li>序列化： 将数据结构或对象转换成二进制串的过程</li>
@@ -1610,7 +1681,7 @@
   </entry>
   <entry>
     <title>C#中ref与out的用法</title>
-    <url>/2019/10/23/re-and-out-usage-in-CSharp/</url>
+    <url>/2019/10/23/Old-re-and-out-usage-in-CSharp/</url>
     <content><![CDATA[<p>C#中有ref和out参数，而lua是弱类型，通过xlua如何访问呢，这当然是可以实现的。</p>
 <span id="more"></span>
 
@@ -1630,7 +1701,7 @@
   </entry>
   <entry>
     <title>并查集原理与应用</title>
-    <url>/2020/06/06/union-find-algorithm/</url>
+    <url>/2020/06/06/Old-union-find-algorithm/</url>
     <content><![CDATA[<p>并查集是一种树形数据结构，用来处理不交集（Disjoint Sets）的合并、查询问题。</p>
 <p>并查集有两个操作，叫做联合-查找算法（Union-find Algorithm），其实可以理解为一个查询操作还有一个合并操作。就像C++的string有find和strcat一样。</p>
 <span id="more"></span>
@@ -1669,7 +1740,7 @@
   </entry>
   <entry>
     <title>用Tensorflow模仿许巍写歌词</title>
-    <url>/2018/05/16/write-lyrics-with-Tensorflow/</url>
+    <url>/2018/05/16/Old-write-lyrics-with-Tensorflow/</url>
     <content><![CDATA[<h3 id="Tensorflow生成歌词"><a href="#Tensorflow生成歌词" class="headerlink" title="Tensorflow生成歌词"></a>Tensorflow生成歌词</h3><p>其实就是抄的<a href="http://leix.me/2016/11/28/tensorflow-lyrics-generation/">这篇文章</a></p>
 <p><a href="https://github.com/karpathy/char-rnn">char-rnn</a>是基于字符预测下一个字符，比如说已知<code>hello</code>的前四个字母<code>hell</code>，那我们就可以据此预测下一个字符很可能是<code>o</code>,因为是字符char级别的，并没有单词或句子层次上的特征提取，相对而言比较简单易学。</p>
 <p>使用方法及数据都在Github了：<a href="https://github.com/jozhn/CharRNN-LRC">CharRNN-LRC</a></p>
@@ -1701,7 +1772,7 @@
   </entry>
   <entry>
     <title>tolua编译集成lua-protobuf指南</title>
-    <url>/2020/11/02/ToLua-Compile-With-lua-protobuf/</url>
+    <url>/2020/11/02/Old-ToLua-Compile-With-lua-protobuf/</url>
     <content><![CDATA[<h2 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h2><p><a href="https://github.com/topameng/tolua_runtime">tolua_runtime</a> 是 <a href="https://github.com/topameng/tolua">tolua</a> 的C源码，编译之后会输出tolua.dll。这个可以自己修改编译，为了给tolua集成lua-protobuf，需要自己编译tolua在各个平台的库。</p>
 <span id="more"></span>
 
@@ -1900,7 +1971,7 @@
   </entry>
   <entry>
     <title>软件测试整理</title>
-    <url>/2018/05/26/software-testing-lesson/</url>
+    <url>/2018/05/26/Old-software-testing-lesson/</url>
     <content><![CDATA[<p><strong>软件测试考点整理</strong></p>
 <h2 id="一、软件测试介绍"><a href="#一、软件测试介绍" class="headerlink" title="一、软件测试介绍"></a><strong>一、软件测试介绍</strong></h2><p><strong>软件缺陷的概念</strong></p>
 <p>从产品内部看，软件缺陷是产品开发或维护过程中所存在的错误、毛病等各种问题。</p>
