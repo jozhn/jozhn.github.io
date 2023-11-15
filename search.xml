@@ -72,6 +72,57 @@
 ]]></content>
   </entry>
   <entry>
+    <title>UnLua invalid property问题定位与修复</title>
+    <url>/2023/10/25/UnLua-invalid-property/</url>
+    <content><![CDATA[<h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>其实从UnLua1.0起就会偶尔遇到访问UObject上面的property是nil的情况，而且都是刚创建出来的UObject，就遇到了这个问题。<br>很显然，UnLua并没有每次都通过反射重新读UObject上面的property，而是读取了property的缓存。那就需要研究一下property的生命周期与UnLua是怎么管理并访问property的缓存的。</p>
+<span id="more"></span>
+
+<h2 id="访问property原理"><a href="#访问property原理" class="headerlink" title="访问property原理"></a>访问property原理</h2><p>首先回顾一下UnLua是怎么访问一个UObject的property的。讲这个的文章太多了，UnLua从1.0以来这里核心逻辑其实没什么变化。这里就简单看一下，也不讲绑定了，可以自己看代码<code>int FObjectRegistry::Bind(UObject* Object)</code>。</p>
+<p>在Lua代码中访问UObject的property时，会先走到UObject的Lua实例的元表的Index元方法（2.0起这些代码被放在了UnLuaLib.cpp中）。</p>
+<p>这个元表就是我们实现UnLua接口<code>GetModuleName</code>中返回那个Lua在<code>require</code>后的Lua module（实际是一份拷贝，而不是那个module本身，目的是避免同时绑定到子类时冲突，可以看<code>bool UUnLuaManager::BindClass(UClass* Class, const FString&amp; InModuleName, FString&amp; Error)</code>的实现），存在<code>package.loaded</code>里面。下面可以简称<code>REQUIRED_MODULE</code>。</p>
+<p>这里可以忽略循环找Super，因为一般不会多重继承Lua。</p>
+<p><img src="https://img.jozhn.com/blog/Pasted%20image%2020231025195838.png" alt="Pasted image 20231025195838"></p>
+<p>关键点是先获取<code>REQUIRED_MODULE</code>，然后<code>local p = mt[k]</code>。获取元表之后用key去访问，触发元表的<code>Class_Index</code>元方法。这个元方法是来自这个UObject的UClass的元表，是首次绑定UObject时为UClass注册的，里面会在运行时缓存这个UClass的property。</p>
+<p><img src="https://img.jozhn.com/blog/Pasted%20image%2020231025200459.png" alt="Pasted image 20231025200459"></p>
+<p><code>Class_Index</code>核心是<code>GetField</code>，直接进去看。</p>
+<p><img src="https://img.jozhn.com/blog/Pasted%20image%2020231025201231.png" alt="Pasted image 20231025201231"></p>
+<p><code>GetField</code>是先获取<code>REQUIRED_MODULE</code>的metatable(就是放在Lua registry里的一个table，可以通过UE.XXX来访问，里面存储UClass的缓存信息FClassDesc等)，然后看里面有没有这个property。</p>
+<p>首次访问肯定是nil啊，那么看看<code>GetFieldInternal</code>做了什么。</p>
+<p><img src="https://img.jozhn.com/blog/Pasted%20image%2020231025201312.png" alt="Pasted image 20231025201312"></p>
+<p><code>GetFieldInternal</code>比较长，我们看截图里这部分就够了。先把刚才拿到的nil pop出去。然后通过<code>mt.__name</code>来拿这个UClass的名字，是蓝图的话一般是<code>/Game/xxx/xxx.xxx_C</code>这样的名字。FieldName就是刚才lua中的<code>mt[k]</code>里的k，是property的名字。接着把ClassName pop出去。</p>
+<p>下面通过ClassName获取ClassDesc，没有的话就会注册（其实既然已经绑定了不可能不存在）。然后通过ClassDesc获取这个property对应的Field。</p>
+<p>再下面是关键，这里判断了<code>Field-&gt;IsInherited()</code>，如果这个变量是继承来的，就需要到父类的metatable中拿，因为生命周期是跟随父类UClass的。</p>
+<p>如果父类metatable中有缓存，就说明是<code>bCached</code>的，也就是有缓存的。没有缓存的话就会走下面<code>PushField</code>重新从Class中拿然后再缓存了。</p>
+<p><img src="https://img.jozhn.com/blog/Pasted%20image%2020231025203438.png" alt="Pasted image 20231025203438"></p>
+<p>这里就把访问property的流程讲完了。</p>
+<h2 id="问题分析"><a href="#问题分析" class="headerlink" title="问题分析"></a>问题分析</h2><p>那么问题可能出现在哪里？</p>
+<ol>
+<li>property是自己UClass中的失效的缓存</li>
+<li>property是父类UClass中的失效的缓存</li>
+</ol>
+<p>就这两种情况。而且实际上，这两种问题是同时存在的。</p>
+<p>首先，只有非Native的UClass才会被gc，其property才有可能失效。所以肯定都是蓝图类型的对象。</p>
+<p>其次，不管是不是父类，缓存都存在property所属的UClass的metatable。</p>
+<p>那么问题就是为什么UClass失效了，它的metatable没有被清理？</p>
+<p>UClass的metatable是在NotifyUObjectDeleted时通过<code>FClassRegistry::StaticUnregister</code>清理的。</p>
+<p>我们应该知道，UE的gc是有过程的，UObject被标记为没有引用到真正被gc清理是需要时间的。所以问题大概率是出在这里。</p>
+<p><img src="https://img.jozhn.com/blog/Pasted%20image%2020231025205025.png" alt="Pasted image 20231025205025"></p>
+<h2 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h2><p>我们可以构造一个环境，每帧创建蓝图对象，访问其property，然后移除引用等待gc。并且在UnLua蓝图类型的UClass注册和清理的地方增加日志查看时序。</p>
+<p>另外问题2是来自父类，所以我们还要让蓝图对象继承自另外一个蓝图。</p>
+<p>这样构造之后其实比较容易能够复现出来两个问题。</p>
+<h2 id="修复"><a href="#修复" class="headerlink" title="修复"></a>修复</h2><h3 id="问题1"><a href="#问题1" class="headerlink" title="问题1"></a>问题1</h3><p>问题1的原因是绑定UObject时会<code>PushMetatable</code>将对应UClass的metatable设置上去，但是这里并没有检查对应UClass的有效性，也就是UClass已经标记为代清理，但还没触发NotifyObjectDeleted事件，所以导致UObject绑定之后立即访问就遇到了失效的property缓存。</p>
+<p>因此，在<code>PushMetatable</code>里面增加检查即可。</p>
+<p><img src="https://img.jozhn.com/blog/Pasted%20image%2020231025205630.png" alt="Pasted image 20231025205630"></p>
+<p>这个问题在去年9月提交给了UnLua的Github ：<br><a href="https://github.com/Tencent/UnLua/pull/515">修复PushMetatable时会使用旧的metatable的问题 by jozhn · Pull Request #515 · Tencent&#x2F;UnLua (github.com)</a></p>
+<h3 id="问题2"><a href="#问题2" class="headerlink" title="问题2"></a>问题2</h3><p>问题2原因和1很相似，但是复现概率会小一些，而且蓝图继承蓝图真的很少用。此外，频繁创建销毁也是不合理的操作，不过从逻辑上来说UnLua还是存在漏洞。</p>
+<p>这个原因是蓝图B继承了蓝图A，在频繁创建销毁的某一次，B的实例创建之后访问继承自A的property，而A的类型处于BeginDestroy状态，但还没触发NotifyObjectDeleted。因此读到了A类型metatable中缓存的property。</p>
+<p>这里为什么会用到旧的metatable呢，理论上GetFieldInternal里面会检查ClassDesc的有效性，无效就会注销并且清理metatable。但是有些情况下，通过<code>FClassDesc::Load</code>函数触发的重新加载UClass信息，不会清理metatable，所以产生了漏网之鱼。这也是这个问题复现概率更小的原因。</p>
+<p>解决办法是针对访问的property来自继承的非Native的UClass时，检查其有效性（实际就是检查UClass的有效性），无效的话就忽略这个缓存，重新<code>PushField</code>，以取到最新的property。</p>
+<p><img src="https://img.jozhn.com/blog/Pasted%20image%2020231025210430.png" alt="Pasted image 20231025210430"></p>
+<p>这个代码目前也提交到了UnLua的Github：<br><a href="https://github.com/Tencent/UnLua/pull/664">修正：访问来自非native父类的property时检查有效性 #661 by jozhn · Pull Request #664 · Tencent&#x2F;UnLua (github.com)</a></p>
+]]></content>
+  </entry>
+  <entry>
     <title>Anti-entropy and Gossiping</title>
     <url>/2017/12/17/Old-Anti-entropy-and-Gossiping/</url>
     <content><![CDATA[<h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><blockquote>
